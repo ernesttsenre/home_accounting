@@ -1,6 +1,6 @@
 from django.views.generic import ListView, DetailView, CreateView
 from django.shortcuts import get_object_or_404
-from money.models import Operation, Account
+from money.models import Operation, Account, Goal
 from money.forms import OperationForm
 from datetime import datetime, timedelta
 
@@ -10,6 +10,9 @@ class AccountList(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(AccountList, self).get_context_data(**kwargs)
+
+        goals = Goal.objects.all()
+        context['goals'] = goals
 
         total_balance = 0
         accounts = self.model.objects.all()

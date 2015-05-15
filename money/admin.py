@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Account, Category, Operation
+from .models import Account, Category, Operation, Goal
 
 admin.site.site_header = 'Управление счетами'
 
@@ -10,6 +10,11 @@ class AccountAdmin(admin.ModelAdmin):
 
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('title', 'created_at')
+    date_hierarchy = 'created_at'
+
+
+class GoalAdmin(admin.ModelAdmin):
+    list_display = ('title', 'get_percent', 'created_at')
     date_hierarchy = 'created_at'
 
 
@@ -24,3 +29,4 @@ class OperationAdmin(admin.ModelAdmin):
 admin.site.register(Account, AccountAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Operation, OperationAdmin)
+admin.site.register(Goal, GoalAdmin)

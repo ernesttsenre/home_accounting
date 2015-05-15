@@ -80,3 +80,30 @@ class Operation(models.Model):
 
     def __str__(self):
         return str(self.amount * self.type)
+
+class Goal(models.Model):
+    class Meta:
+        verbose_name = 'Цель'
+        verbose_name_plural = 'Цели'
+
+    title = models.CharField(max_length=256, verbose_name='Название')
+    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Сумма')
+    account = models.ForeignKey(Account, verbose_name='Счет', related_name='goals', on_delete='cascade')
+    created_at = models.DateTimeField(verbose_name='Создан', auto_now_add=True)
+
+    def get_percent(self):
+        account_balance = self.account.get_balance()
+        percent = float(account_balance * 100) / float(self.amount)
+        return int(percent)
+
+    def get_color(self):
+        percent = self.get_percent()
+        if percent > 80:
+            return 'danger'
+        elif percent > 50:
+            return 'warning'
+        elif percent > 25:
+            return 'success'
+        else:
+            return 'info'
+

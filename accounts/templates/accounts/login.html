@@ -1,15 +1,24 @@
-{% extends 'base.html' %}
+{% extends 'auth.html' %}
 
 {% block content %}
     {% if form.errors %}
-        <p>Your username and password didn't match. Please try again.</p>
+        <div class="alert alert-danger">
+            Авторизация провалена, попробуйте снова
+        </div>
     {% endif %}
-    <form method="post" action="{% url 'accounts:login' %}">
+
+    <form class="form-signin" method="post" action="{% url 'accounts:login' %}">
         {% csrf_token %}
-        <table>
-            {{ form }}
-        </table>
-        <input type="submit" value="login"/>
+
+        <h2 class="form-signin-heading text-center">Авторизация</h2>
+
+        <label for="inputEmail" class="sr-only">Логин</label>
+        <input type="text" name="username" id="inputEmail" class="form-control" placeholder="Логин" required autofocus>
+
+        <label for="inputPassword" class="sr-only">Пароль</label>
+        <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Пароль" required>
+
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Войти</button>
         <input type="hidden" name="next" value="/"/>
     </form>
 {% endblock %}

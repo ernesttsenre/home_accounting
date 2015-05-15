@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+
+{% block content %}
+    <br/>
+
+    <ol class="breadcrumb">
+        <li><a href="{% url 'money:index' %}">Счета</a></li>
+        <li><a href="{% url 'money:account' account.id %}">{{ account.title }}</a></li>
+    </ol>
+
+    <div class="lead">Новая транзакция</div>
+
+    <form action="{% url 'money:create_operation' account.id %}" method="post">
+        {% csrf_token %}
+
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                {{ form.errors }}
+            </div>
+        {% endif %}
+
+        {% for field in form %}
+            {% if not field.is_hidden %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary btn-block">Сохранить</button>
+    </form>
+{% endblock %}

@@ -15,6 +15,8 @@ import os
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
+
 LOCALE_PATHS = (BASE_DIR + '/locale',)
 
 TEMPLATE_CONTEXT_PROCESSORS = TCP + (
@@ -128,5 +130,5 @@ STATICFILES_DIRS = (
 )
 
 TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'django_project/templates'),
+    PROJECT_PATH + '/templates/',
 )

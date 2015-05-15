@@ -28,7 +28,7 @@ TEMPLATE_CONTEXT_PROCESSORS = TCP + (
 SECRET_KEY = 'a_=jv*qz*rt6wlhg7x8&+j_mj(!&6p*7@f7&jj5zd1s$#x7%rv'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     '127.0.0.1',

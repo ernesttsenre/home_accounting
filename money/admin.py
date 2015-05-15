@@ -14,7 +14,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 class GoalAdmin(admin.ModelAdmin):
-    list_display = ('title', 'get_percent', 'created_at')
+    list_display = ('title', 'amount', 'get_percent', 'created_at')
     date_hierarchy = 'created_at'
 
 

@@ -1,6 +1,10 @@
 {% extends 'auth.html' %}
 
 {% block content %}
+    <br/>
+
+    <div class="lead text-center">Авторизация</div>
+
     {% if form.errors %}
         <div class="alert alert-danger">
             Авторизация провалена, попробуйте снова
@@ -10,15 +14,15 @@
     <form class="form-signin" method="post" action="{% url 'accounts:login' %}">
         {% csrf_token %}
 
-        <h2 class="form-signin-heading text-center">Авторизация</h2>
+        <div class="form-group">
+            <input type="text" name="username" class="form-control" placeholder="Логин" required autofocus>
+        </div>
 
-        <label for="inputEmail" class="sr-only">Логин</label>
-        <input type="text" name="username" id="inputEmail" class="form-control" placeholder="Логин" required autofocus>
+        <div class="form-group">
+            <input type="password" name="password" class="form-control" placeholder="Пароль" required>
+        </div>
 
-        <label for="inputPassword" class="sr-only">Пароль</label>
-        <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Пароль" required>
-
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Войти</button>
+        <button class="btn btn-primary btn-block" type="submit">Войти</button>
         <input type="hidden" name="next" value="/"/>
     </form>
 {% endblock %}

@@ -8,7 +8,13 @@ class OperationForm(forms.ModelForm):
         fields = ('amount', 'type', 'category', 'comment')
 
         widgets = {
-            'amount': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Сумма транзакции'}),
+            'amount': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Сумма транзакции',
+                'inputmode': 'numeric',
+                'pattern': '[0-9]*',
+            }),
+
             'category': forms.Select(attrs={'class': 'form-control'}),
             'type': forms.Select(attrs={'class': 'form-control'}),
             'comment': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),

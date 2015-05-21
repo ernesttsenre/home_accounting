@@ -2,6 +2,9 @@ from django.db import models
 from django.db.models import Sum, F, FloatField
 from django.contrib.auth.models import User
 from django.contrib.humanize.templatetags.humanize import intcomma
+from django.db.models.signals import post_save
+import easy
+
 
 class Account(models.Model):
     class Meta:
@@ -32,9 +35,12 @@ class Account(models.Model):
         else:
             return 'default'
 
-    def __str__(self):
+    def get_name(self):
         balance_string = intcomma(self.get_balance())
         return "%s (%s %s)" % (self.title, balance_string, 'руб.')
+
+    def __str__(self):
+        return self.get_name()
 
 
 class Category(models.Model):
@@ -49,18 +55,44 @@ class Category(models.Model):
         return self.title
 
 
+class Transfer(models.Model):
+    class Meta:
+        verbose_name = 'Перевод'
+        verbose_name_plural = 'Переводы'
+
+    account_from = models.ForeignKey(Account, verbose_name='Счет кредитор', related_name='accounts_from',
+                                     on_delete=models.CASCADE)
+    account_to = models.ForeignKey(Account, verbose_name='Счет дебитор', related_name='accounts_to',
+                                   on_delete=models.CASCADE)
+    user = models.ForeignKey(User, verbose_name='Пользователь')
+    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Сумма')
+    comment = models.TextField(verbose_name='Комментарий', null=True, blank=True)
+    created_at = models.DateTimeField(verbose_name='Создан', auto_now_add=True)
+
+    @easy.short(desc='Название')
+    def get_name(self):
+        return "Перевод с счета: %s, на счет: %s" % (self.account_from.title, self.account_to.title)
+
+    def __str__(self):
+        return self.get_name()
+
+
 class Operation(models.Model):
     class Meta:
         verbose_name = 'Транзакция'
         verbose_name_plural = 'Транзакции'
 
+    CREDIT_OPERATION = -1
+    DEBIT_OPERATION = 1
     OPERATION_TYPES = (
-        (1, 'Приход'),
-        (-1, 'Расход'),
+        (DEBIT_OPERATION, 'Приход'),
+        (CREDIT_OPERATION, 'Расход'),
     )
 
-    account = models.ForeignKey(Account, verbose_name='Счет', related_name='operations', on_delete='cascade')
-    category = models.ForeignKey(Category, verbose_name='Основание')
+    account = models.ForeignKey(Account, verbose_name='Счет', related_name='operations', on_delete=models.CASCADE)
+    transfer = models.ForeignKey(Transfer, verbose_name='Перевод', related_name='transfers', on_delete=models.CASCADE,
+                                 null=True, blank=True, editable=False)
+    category = models.ForeignKey(Category, verbose_name='Основание', null=True, blank=True)
     user = models.ForeignKey(User, verbose_name='Пользователь')
     amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Сумма')
     type = models.IntegerField(choices=OPERATION_TYPES, verbose_name='Тип операции')
@@ -68,18 +100,36 @@ class Operation(models.Model):
     created_at = models.DateTimeField(verbose_name='Создан', auto_now_add=True)
 
     def get_amount(self):
-        return self.amount * self.type
+        return str(self.amount * self.type)
 
     def get_color(self):
+        if self.transfer:
+            return 'info'
+
         if self.type < 0:
             return 'danger'
         return 'success'
 
-    def description(self):
-        return self
+    @easy.short(desc='Основание', order='category')
+    def get_category_title(self):
+        title = 'Перевод'
+        if self.category:
+            title = self.category.title
+        return title
+
+    @easy.short(desc='Сумма', order='amount')
+    def get_name(self):
+        return str(self.amount * self.type)
+
+    @easy.short(desc='Перевод денег?', bool=True)
+    def is_transfer(self):
+        if self.transfer:
+            return True
+        return False
 
     def __str__(self):
-        return str(self.amount * self.type)
+        return self.get_name()
+
 
 class Goal(models.Model):
     class Meta:
@@ -88,9 +138,10 @@ class Goal(models.Model):
 
     title = models.CharField(max_length=256, verbose_name='Название')
     amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Сумма')
-    account = models.ForeignKey(Account, verbose_name='Счет', related_name='goals', on_delete='cascade')
+    account = models.ForeignKey(Account, verbose_name='Счет', related_name='goals', on_delete=models.CASCADE)
     created_at = models.DateTimeField(verbose_name='Создан', auto_now_add=True)
 
+    @easy.short(desc='Достижение')
     def get_percent(self):
         account_balance = self.account.get_balance()
         percent = float(account_balance * 100) / float(self.amount)
@@ -107,3 +158,23 @@ class Goal(models.Model):
         else:
             return 'info'
 
+
+def create_transfer_operations(sender, instance, **kwargs):
+    credit_operation = Operation()
+    credit_operation.account = instance.account_from
+    credit_operation.transfer = instance
+    credit_operation.user = instance.user
+    credit_operation.amount = instance.amount
+    credit_operation.type = Operation.CREDIT_OPERATION
+    credit_operation.save()
+
+    debit_operation = Operation()
+    debit_operation.account = instance.account_to
+    debit_operation.transfer = instance
+    debit_operation.user = instance.user
+    debit_operation.amount = instance.amount
+    debit_operation.type = Operation.DEBIT_OPERATION
+    debit_operation.save()
+
+
+post_save.connect(create_transfer_operations, sender=Transfer)

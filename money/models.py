@@ -3,6 +3,7 @@ from django.db.models import Sum, F, FloatField
 from django.contrib.auth.models import User
 from django.contrib.humanize.templatetags.humanize import intcomma
 from django.db.models.signals import post_save, post_delete
+from django.core import validators
 import easy
 
 
@@ -12,9 +13,26 @@ class Account(models.Model):
         verbose_name_plural = 'Счета'
         ordering = ['-balance']
 
-    title = models.CharField(max_length=256, verbose_name='Название')
-    balance = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Баланс', editable=False, default=0)
-    created_at = models.DateTimeField(verbose_name='Создан', auto_now_add=True)
+    title = models.CharField(
+        max_length=256,
+        verbose_name='Название'
+    )
+
+    balance = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name='Баланс',
+        editable=False,
+        default=0,
+        validators=[
+            validators.MinValueValidator(0, 'Недостаточно средств на счете')
+        ]
+    )
+
+    created_at = models.DateTimeField(
+        verbose_name='Создан',
+        auto_now_add=True
+    )
 
     def get_balance(self):
         aggregate = self.operations.all().aggregate(
@@ -50,8 +68,15 @@ class Category(models.Model):
         verbose_name = 'Основание'
         verbose_name_plural = 'Основания'
 
-    title = models.CharField(max_length=256, verbose_name='Название')
-    created_at = models.DateTimeField(verbose_name='Создан', auto_now_add=True)
+    title = models.CharField(
+        max_length=256,
+        verbose_name='Название'
+    )
+
+    created_at = models.DateTimeField(
+        verbose_name='Создан',
+        auto_now_add=True
+    )
 
     def __str__(self):
         return self.title
@@ -62,14 +87,44 @@ class Transfer(models.Model):
         verbose_name = 'Перевод'
         verbose_name_plural = 'Переводы'
 
-    account_from = models.ForeignKey(Account, verbose_name='Счет кредитор', related_name='accounts_from',
-                                     on_delete=models.CASCADE)
-    account_to = models.ForeignKey(Account, verbose_name='Счет дебитор', related_name='accounts_to',
-                                   on_delete=models.CASCADE)
-    user = models.ForeignKey(User, verbose_name='Пользователь')
-    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Сумма')
-    comment = models.TextField(verbose_name='Комментарий', null=True, blank=True)
-    created_at = models.DateTimeField(verbose_name='Создан', auto_now_add=True)
+    account_from = models.ForeignKey(
+        Account,
+        verbose_name='Счет кредитор',
+        related_name='accounts_from',
+        on_delete=models.CASCADE
+    )
+
+    account_to = models.ForeignKey(
+        Account,
+        verbose_name='Счет дебитор',
+        related_name='accounts_to',
+        on_delete=models.CASCADE
+    )
+
+    user = models.ForeignKey(
+        User,
+        verbose_name='Пользователь'
+    )
+
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name='Сумма',
+        validators=[
+            validators.MinValueValidator(1, 'Сумма транзакции должна быть больше 0')
+        ]
+    )
+
+    comment = models.TextField(
+        verbose_name='Комментарий',
+        null=True,
+        blank=True
+    )
+
+    created_at = models.DateTimeField(
+        verbose_name='Создан',
+        auto_now_add=True
+    )
 
     @easy.short(desc='Название')
     def get_name(self):
@@ -91,15 +146,59 @@ class Operation(models.Model):
         (CREDIT_OPERATION, 'Расход'),
     )
 
-    account = models.ForeignKey(Account, verbose_name='Счет', related_name='operations', on_delete=models.CASCADE)
-    transfer = models.ForeignKey(Transfer, verbose_name='Перевод', related_name='transfers', on_delete=models.CASCADE,
-                                 null=True, blank=True, editable=False)
-    category = models.ForeignKey(Category, verbose_name='Основание', null=True, blank=True)
-    user = models.ForeignKey(User, verbose_name='Пользователь')
-    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Сумма')
-    type = models.IntegerField(choices=OPERATION_TYPES, verbose_name='Тип операции')
-    comment = models.TextField(verbose_name='Комментарий', null=True, blank=True)
-    created_at = models.DateTimeField(verbose_name='Создан', auto_now_add=True)
+    account = models.ForeignKey(
+        Account,
+        verbose_name='Счет',
+        related_name='operations',
+        on_delete=models.CASCADE
+    )
+
+    transfer = models.ForeignKey(
+        Transfer,
+        verbose_name='Перевод',
+        related_name='transfers',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        editable=False
+    )
+
+    category = models.ForeignKey(
+        Category,
+        verbose_name='Основание',
+        null=True,
+        blank=True
+    )
+
+    user = models.ForeignKey(
+        User,
+        verbose_name='Пользователь'
+    )
+
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name='Сумма',
+        validators=[
+            validators.MinValueValidator(1, 'Сумма перевода должна быть больше 0'),
+        ]
+    )
+
+    type = models.IntegerField(
+        choices=OPERATION_TYPES,
+        verbose_name='Тип операции'
+    )
+
+    comment = models.TextField(
+        verbose_name='Комментарий',
+        null=True,
+        blank=True
+    )
+
+    created_at = models.DateTimeField(
+        verbose_name='Создан',
+        auto_now_add=True
+    )
 
     def get_amount(self):
         return str(self.amount * self.type)
@@ -144,11 +243,39 @@ class Goal(models.Model):
         verbose_name_plural = 'Цели'
         ordering = ['-percent']
 
-    title = models.CharField(max_length=256, verbose_name='Название')
-    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Сумма')
-    percent = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Достижение', editable=False, default=0)
-    account = models.ForeignKey(Account, verbose_name='Счет', related_name='goals', on_delete=models.CASCADE)
-    created_at = models.DateTimeField(verbose_name='Создан', auto_now_add=True)
+    title = models.CharField(
+        max_length=256,
+        verbose_name='Название'
+    )
+
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name='Сумма',
+        validators=[
+            validators.MinValueValidator(1, 'Сумма цели должна быть больше 0')
+        ]
+    )
+
+    percent = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name='Достижение',
+        editable=False,
+        default=0
+    )
+
+    account = models.ForeignKey(
+        Account,
+        verbose_name='Счет',
+        related_name='goals',
+        on_delete=models.CASCADE
+    )
+
+    created_at = models.DateTimeField(
+        verbose_name='Создан',
+        auto_now_add=True
+    )
 
     @easy.short(desc='Достижение')
     def get_percent(self):

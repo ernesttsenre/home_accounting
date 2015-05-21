@@ -1,3 +1,4 @@
 django
 django-suit
 psycopg2
+django-admin-easy

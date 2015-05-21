@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models import Sum, F, FloatField
 from django.contrib.auth.models import User
 from django.contrib.humanize.templatetags.humanize import intcomma
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 import easy
 
 
@@ -191,5 +191,16 @@ def create_operation(sender, instance, **kwargs):
         goal.save()
 
 
+def delete_operation(sender, instance, **kwargs):
+    instance.account.balance = instance.account.get_balance()
+    instance.account.save()
+
+    goals = Goal.objects.filter(account_id=instance.account.id)
+    for goal in goals:
+        goal.percent = goal.get_percent()
+        goal.save()
+
+
 post_save.connect(create_transfer_operations, sender=Transfer)
 post_save.connect(create_operation, sender=Operation)
+post_delete.connect(create_operation, sender=Operation)

@@ -113,9 +113,14 @@ class Operation(models.Model):
 
     @easy.short(desc='Основание', order='category')
     def get_category_title(self):
-        title = 'Перевод'
         if self.category:
             title = self.category.title
+        else:
+            if self.type == Operation.CREDIT_OPERATION:
+                title = "Перевод в %s" % self.transfer.account_to.title
+            else:
+                title = "Перевод из %s" % self.transfer.account_from.title
+
         return title
 
     @easy.short(desc='Сумма', order='amount')

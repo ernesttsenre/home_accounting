@@ -1,7 +1,7 @@
 from django.views.generic import ListView, DetailView, CreateView
 from django.shortcuts import get_object_or_404
-from money.models import Operation, Account, Goal
-from money.forms import OperationForm
+from money.models import Operation, Account, Goal, Transfer
+from money.forms import OperationForm, TransferForm
 from datetime import datetime, timedelta
 
 
@@ -64,3 +64,13 @@ class OperationCreate(CreateView):
         form.instance.account = self.account
         form.instance.user = self.user
         return super(OperationCreate, self).form_valid(form)
+
+
+class TransferCreate(CreateView):
+    form_class = TransferForm
+    template_name = 'money/transfer_create.html'
+    success_url = '/'
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super(TransferCreate, self).form_valid(form)

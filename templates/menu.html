@@ -13,6 +13,7 @@
         <div id="navbar" class="collapse navbar-collapse">
             {% if user.is_authenticated %}
                 <ul class="nav navbar-nav navbar-right">
+                    <li><a href="{% url 'money:create_transfer' %}">Создать перевод</a></li>
                     <li><a href="{% url 'accounts:logout' %}">Выйти</a></li>
                 </ul>
             {% endif %}

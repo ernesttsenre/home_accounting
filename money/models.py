@@ -12,6 +12,7 @@ class Account(models.Model):
         verbose_name_plural = 'Счета'
 
     title = models.CharField(max_length=256, verbose_name='Название')
+    balance = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Баланс', editable=False, default=0)
     created_at = models.DateTimeField(verbose_name='Создан', auto_now_add=True)
 
     def get_balance(self):
@@ -138,6 +139,7 @@ class Goal(models.Model):
 
     title = models.CharField(max_length=256, verbose_name='Название')
     amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Сумма')
+    percent = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Достижение', editable=False, default=0)
     account = models.ForeignKey(Account, verbose_name='Счет', related_name='goals', on_delete=models.CASCADE)
     created_at = models.DateTimeField(verbose_name='Создан', auto_now_add=True)
 
@@ -160,6 +162,8 @@ class Goal(models.Model):
 
 
 def create_transfer_operations(sender, instance, **kwargs):
+    Operation.objects.filter(transfer_id=instance.id).delete()
+
     credit_operation = Operation()
     credit_operation.account = instance.account_from
     credit_operation.transfer = instance
@@ -177,4 +181,15 @@ def create_transfer_operations(sender, instance, **kwargs):
     debit_operation.save()
 
 
+def create_operation(sender, instance, **kwargs):
+    instance.account.balance = instance.account.get_balance()
+    instance.account.save()
+
+    goals = Goal.objects.filter(account_id=instance.account.id)
+    for goal in goals:
+        goal.percent = goal.get_percent()
+        goal.save()
+
+
 post_save.connect(create_transfer_operations, sender=Transfer)
+post_save.connect(create_operation, sender=Operation)

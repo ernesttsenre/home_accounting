@@ -5,8 +5,18 @@ import easy
 admin.site.site_header = 'Управление счетами'
 
 class AccountAdmin(admin.ModelAdmin):
-    list_display = ('get_name', 'created_at')
+    list_display = ('title', 'balance', 'created_at')
     date_hierarchy = 'created_at'
+
+    actions = ('recalculate_action',)
+
+    @easy.action('Пересчитать баланс')
+    def recalculate_action(self, request, queryset):
+        for qs in queryset:
+            qs.balance = qs.get_balance()
+            qs.save()
+
+        self.message_user(request, "Баланс пересчитан")
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -15,8 +25,18 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 class GoalAdmin(admin.ModelAdmin):
-    list_display = ('title', 'amount', 'get_percent', 'created_at')
+    list_display = ('title', 'amount', 'percent', 'created_at')
     date_hierarchy = 'created_at'
+
+    actions = ('recalculate_action',)
+
+    @easy.action('Пересчитать процент')
+    def recalculate_action(self, request, queryset):
+        for qs in queryset:
+            qs.percent = qs.get_percent()
+            qs.save()
+
+        self.message_user(request, "Процент пересчитан")
 
 
 class OperationAdmin(admin.ModelAdmin):

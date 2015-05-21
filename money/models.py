@@ -27,7 +27,7 @@ class Account(models.Model):
         return balance
 
     def get_color(self):
-        balance = self.get_balance()
+        balance = self.balance
 
         if balance < 0:
             return 'danger'
@@ -37,7 +37,7 @@ class Account(models.Model):
             return 'default'
 
     def get_name(self):
-        balance_string = intcomma(self.get_balance())
+        balance_string = intcomma(self.balance)
         return "%s (%s %s)" % (self.title, balance_string, 'руб.')
 
     def __str__(self):

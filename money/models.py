@@ -10,6 +10,7 @@ class Account(models.Model):
     class Meta:
         verbose_name = 'Счет'
         verbose_name_plural = 'Счета'
+        ordering = ['-balance']
 
     title = models.CharField(max_length=256, verbose_name='Название')
     balance = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Баланс', editable=False, default=0)
@@ -141,6 +142,7 @@ class Goal(models.Model):
     class Meta:
         verbose_name = 'Цель'
         verbose_name_plural = 'Цели'
+        ordering = ['-percent']
 
     title = models.CharField(max_length=256, verbose_name='Название')
     amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Сумма')

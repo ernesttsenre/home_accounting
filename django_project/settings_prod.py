@@ -128,3 +128,13 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'templates/static/'),
 )
+
+SUIT_CONFIG = {
+    'ADMIN_NAME': 'Панель управления',
+    'MENU_OPEN_FIRST_CHILD': True,
+    'MENU_ICONS': {
+        'money': 'icon-lock',
+        'auth': 'icon-user',
+    },
+    'LIST_PER_PAGE': 50
+}

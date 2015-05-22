@@ -1,10 +1,19 @@
 language: python
+
 python:
   - "3.4"
   - "nightly"
 
-# command to install dependencies
-install: "pip install -r requirements.txt"
+services: postgresql
 
-# command to run tests
-script: python manage.py test
+before_install:
+  - export DJANGO_SETTINGS_MODULE=django_project.settings_prod
+  - export PIP_USE_MIRRORS=true
+
+install:
+  - pip install -r requirements.txt
+
+script:
+  - psql -c "CREATE USER django WITH password 'j2sYlTGz45';" -U postgres
+  - psql -c "ALTER USER django CREATEDB;" -U postgres
+  - python manage.py test

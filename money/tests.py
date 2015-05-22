@@ -102,6 +102,6 @@ class BaseTest(TestCase):
         )
 
         self.assertEqual(self.debit_account.balance, operation_amount)
-        
+
         self.goal.refresh_from_db()
         self.assertEqual(self.goal.percent, wish_percent)

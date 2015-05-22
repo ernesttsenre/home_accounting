@@ -4,6 +4,7 @@ import easy
 
 admin.site.site_header = 'Управление счетами'
 
+
 class AccountAdmin(admin.ModelAdmin):
     list_display = ('title', 'balance', 'created_at')
     date_hierarchy = 'created_at'
@@ -50,6 +51,7 @@ class OperationAdmin(admin.ModelAdmin):
 class TransferAdmin(admin.ModelAdmin):
     list_display = ('get_name', 'amount', 'created_at')
     date_hierarchy = 'created_at'
+
 
 admin.site.register(Account, AccountAdmin)
 admin.site.register(Category, CategoryAdmin)

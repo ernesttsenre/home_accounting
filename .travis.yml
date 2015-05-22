@@ -15,6 +15,6 @@ install:
 before_script:
   - psql -c "CREATE USER django WITH password 'j2sYlTGz45';" -U postgres
   - psql -c "ALTER USER django CREATEDB;" -U postgres
-  
+
 script:
   - python manage.py test

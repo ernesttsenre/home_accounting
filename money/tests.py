@@ -2,30 +2,66 @@ from django.test import TestCase
 from money.models import Account, Operation, Transfer, Category
 from django.contrib.auth.models import User
 
+DEFAULT_CREDIT_ACCOUNT_AMOUNT = 10000
+DEFAULT_DEBIT_ACCOUNT_AMOUNT = 0
+
+
+class FixturesTest(TestCase):
+    fixtures = ['dump/users.json', 'dump/fixtures.json']
+
+    def setUp(self):
+        self.credit_account = Account.objects.get(pk=1)
+        self.debit_account = Account.objects.get(pk=2)
+
+    def test_is_fixtures_correct(self):
+        self.assertEqual(self.credit_account.balance, DEFAULT_CREDIT_ACCOUNT_AMOUNT)
+        self.assertEqual(self.debit_account.balance, DEFAULT_DEBIT_ACCOUNT_AMOUNT)
+
 
 class BaseTest(TestCase):
-    def test_testing_system(self):
-        return self.assertEqual(True, True)
+    fixtures = ['dump/users.json', 'dump/fixtures.json']
 
-
-class TransferTest(TestCase):
     def setUp(self):
-        self.credit_amount = 10000
-        self.debit_amount = 0
+        self.credit_account = Account.objects.get(pk=1)
+        self.debit_account = Account.objects.get(pk=2)
+        self.category = Category.objects.get(pk=1)
+        self.user = User.objects.get(pk=1)
 
-        self.user = User.objects.create(username='ernesttsenre', password='password', email='ernest.oleg.iv@gmail.com')
-        self.category = Category.objects.create(title='Тесты')
-        self.credit_account = Account.objects.create(title='Счет кредитор', balance=self.credit_amount)
-        self.debit_account = Account.objects.create(title='Счет дебитор', balance=self.debit_amount)
+    def test_changes_account_balance_when_create_new_debit_operation(self):
+        """
+        Когда для счета создается транзакция пополнения, необходимо проверить баланс счета,
+        т.к. он пересчитывается сигналами
+        :return:
+        """
 
-        # создаю остаток на счете
+        operation_amount = 1000
         Operation.objects.create(
             account=self.credit_account,
-            amount=self.credit_amount,
-            user=self.user,
             category=self.category,
-            type=Operation.DEBIT_OPERATION
+            user=self.user,
+            type=Operation.DEBIT_OPERATION,
+            amount=operation_amount
         )
+
+        self.assertEqual(self.credit_account.balance, DEFAULT_CREDIT_ACCOUNT_AMOUNT + operation_amount)
+
+    def test_changes_account_balance_when_create_new_credit_operation(self):
+        """
+        Когда для счета создается транзакция списания, необходимо проверить баланс счета,
+        т.к. он пересчитывается сигналами
+        :return:
+        """
+
+        operation_amount = 1000
+        Operation.objects.create(
+            account=self.credit_account,
+            category=self.category,
+            user=self.user,
+            type=Operation.CREDIT_OPERATION,
+            amount=operation_amount
+        )
+
+        self.assertEqual(self.credit_account.balance, DEFAULT_CREDIT_ACCOUNT_AMOUNT - operation_amount)
 
     def test_create_operations_for_accounts_when_transfer_created(self):
         """
@@ -33,9 +69,6 @@ class TransferTest(TestCase):
         и операцию прихода, на туже сумму, на дебиторном счету
         :return:
         """
-
-        self.assertEqual(self.credit_account.balance, self.credit_amount)
-        self.assertEqual(self.debit_account.balance, self.debit_amount)
 
         transfer_amount = 1000
         transfer = Transfer.objects.create(
@@ -45,5 +78,5 @@ class TransferTest(TestCase):
             user=self.user
         )
 
-        self.assertEqual(self.credit_account.balance, self.credit_amount - transfer_amount)
-        self.assertEqual(self.debit_account.balance, self.debit_amount + transfer_amount)
+        self.assertEqual(self.credit_account.balance, DEFAULT_CREDIT_ACCOUNT_AMOUNT - transfer_amount)
+        self.assertEqual(self.debit_account.balance, DEFAULT_DEBIT_ACCOUNT_AMOUNT + transfer_amount)

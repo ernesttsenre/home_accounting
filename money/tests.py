@@ -7,7 +7,7 @@ DEFAULT_DEBIT_ACCOUNT_AMOUNT = 0
 
 
 class FixturesTest(TestCase):
-    fixtures = ['dump/users.json', 'dump/fixtures.json']
+    fixtures = ['django_project/fixtures/users.json', 'money/fixtures/money.json']
 
     def setUp(self):
         self.credit_account = Account.objects.get(pk=1)
@@ -19,7 +19,7 @@ class FixturesTest(TestCase):
 
 
 class BaseTest(TestCase):
-    fixtures = ['dump/users.json', 'dump/fixtures.json']
+    fixtures = ['django_project/fixtures/users.json', 'money/fixtures/money.json']
 
     def setUp(self):
         self.credit_account = Account.objects.get(pk=1)

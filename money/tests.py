@@ -1,5 +1,5 @@
 from django.test import TestCase
-from money.models import Account, Operation, Transfer, Category
+from money.models import Account, Operation, Transfer, Category, Goal
 from django.contrib.auth.models import User
 
 DEFAULT_CREDIT_ACCOUNT_AMOUNT = 10000
@@ -26,6 +26,7 @@ class BaseTest(TestCase):
         self.debit_account = Account.objects.get(pk=2)
         self.category = Category.objects.get(pk=1)
         self.user = User.objects.get(pk=1)
+        self.goal = Goal.objects.get(pk=1)
 
     def test_changes_account_balance_when_create_new_debit_operation(self):
         """
@@ -80,3 +81,27 @@ class BaseTest(TestCase):
 
         self.assertEqual(self.credit_account.balance, DEFAULT_CREDIT_ACCOUNT_AMOUNT - transfer_amount)
         self.assertEqual(self.debit_account.balance, DEFAULT_DEBIT_ACCOUNT_AMOUNT + transfer_amount)
+
+    def test_goal_percent_when_create_debit_operation_in_account(self):
+        """
+        Когда пополняется счет, к которому прявязана цель,
+        её процент выполнения должен пересчитаться
+        :return:
+        """
+
+        self.assertEqual(self.goal.percent, 0)
+
+        operation_amount = self.goal.amount / 2
+        wish_percent = operation_amount / self.goal.amount * 100
+        Operation.objects.create(
+            account=self.debit_account,
+            category=self.category,
+            user=self.user,
+            type=Operation.DEBIT_OPERATION,
+            amount=operation_amount
+        )
+
+        self.assertEqual(self.debit_account.balance, operation_amount)
+        
+        self.goal.refresh_from_db()
+        self.assertEqual(self.goal.percent, wish_percent)

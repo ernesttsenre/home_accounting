@@ -36,5 +36,17 @@
       "created_at": "2015-01-01T00:00:06.453000Z"
     },
     "pk": 1
+  },
+  {
+    "model": "money.goal",
+    "fields": {
+      "title": "Тест",
+      "amount": 10000,
+      "account": 2,
+      "percent": 0,
+      "amount": 10000,
+      "created_at": "2015-01-01T00:00:06.453000Z"
+    },
+    "pk": 1
   }
 ]

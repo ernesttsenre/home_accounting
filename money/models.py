@@ -135,13 +135,18 @@ class Transfer(models.Model):
         super(Transfer, self).clean()
         errors = {}
 
-        if self.account_from == self.account_to:
-            errors['account_to'] = 'Перевод не выполнен - нельзя переводить деньги на тот же счет'
+        if hasattr(self, 'account_from') and hasattr(self, 'account_to'):
+            if self.account_from == self.account_to:
+                errors['account_to'] = 'Перевод не выполнен - нельзя переводить деньги на тот же счет'
 
-        account_from_balance = self.account_from.balance
-        yet = account_from_balance - self.amount
-        if yet < 0:
-            errors['amount'] = 'Перевод не выполнен - недостаточно средств'
+            amount = 0
+            if self.amount:
+                amount = self.amount
+
+            account_from_balance = self.account_from.balance
+            yet = account_from_balance - amount
+            if yet < 0:
+                errors['amount'] = 'Перевод не выполнен - недостаточно средств'
 
         if errors:
             raise ValidationError(errors)

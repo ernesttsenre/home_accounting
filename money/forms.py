@@ -39,6 +39,13 @@ class OperationForm(forms.ModelForm):
         return cleaned_data
 
 
+class OperationFormAdmin(OperationForm):
+    class Meta:
+        widgets = {
+            'user': forms.Select(attrs={'class': 'form-control'}),
+            'account': forms.Select(attrs={'class': 'form-control'}),
+        }
+
 
 class TransferForm(forms.ModelForm):
     class Meta:
@@ -77,3 +84,10 @@ class TransferForm(forms.ModelForm):
                 self._errors['amount'].append('Перевод не выполнен - недостаточно средств')
 
         return cleaned_data
+
+
+class TransferFormAdmin(TransferForm):
+    class Meta:
+        widgets = {
+            'user': forms.Select(attrs={'class': 'form-control'}),
+        }

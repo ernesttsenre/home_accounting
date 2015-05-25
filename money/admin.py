@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import Account, Category, Operation, Goal, Transfer
+from django.db import models
+from money.models import Account, Category, Operation, Goal, Transfer
+from money.forms import OperationFormAdmin, TransferFormAdmin
 import easy
 
 admin.site.site_header = 'Управление счетами'
@@ -41,6 +43,7 @@ class GoalAdmin(admin.ModelAdmin):
 
 
 class OperationAdmin(admin.ModelAdmin):
+    form = OperationFormAdmin
     list_display = ('get_name', 'user', 'get_category_title', 'account', 'is_transfer', 'created_at')
     list_filter = ('user', 'category', 'account', 'created_at')
     search_fields = ['comment']
@@ -49,6 +52,7 @@ class OperationAdmin(admin.ModelAdmin):
 
 
 class TransferAdmin(admin.ModelAdmin):
+    form = TransferFormAdmin
     list_display = ('get_name', 'amount', 'created_at')
     date_hierarchy = 'created_at'
 

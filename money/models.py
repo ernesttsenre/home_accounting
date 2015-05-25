@@ -132,17 +132,19 @@ class Transfer(models.Model):
         return "Перевод с счета: %s, на счет: %s" % (self.account_from.title, self.account_to.title)
 
     def clean(self):
+        super(Transfer, self).clean()
+        errors = {}
+
         if self.account_from == self.account_to:
-            raise ValidationError({
-                'account_to': 'Перевод не выполнен - нельзя переводить деньги на тот же счет'
-            })
+            errors['account_to'] = 'Перевод не выполнен - нельзя переводить деньги на тот же счет'
 
         account_from_balance = self.account_from.balance
         yet = account_from_balance - self.amount
         if yet < 0:
-            raise ValidationError({
-                'amount': 'Перевод не выполнен - недостаточно средств'
-            })
+            errors['amount'] = 'Перевод не выполнен - недостаточно средств'
+
+        if errors:
+            raise ValidationError(errors)
 
     def __str__(self):
         return self.get_name()
@@ -248,13 +250,17 @@ class Operation(models.Model):
         return False
 
     def clean(self):
+        super(Operation, self).clean()
+        errors = {}
+
         if self.type == Operation.CREDIT_OPERATION:
             account_balance = self.account.balance
             yet = account_balance - self.amount
             if yet < 0:
-                raise ValidationError({
-                    'type': 'Операция не возможна - недостаточно средств'
-                })
+                errors['type'] = 'Операция не возможна - недостаточно средств'
+
+        if errors:
+            raise ValidationError(errors)
 
     def __str__(self):
         return self.get_name()

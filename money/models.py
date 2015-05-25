@@ -270,7 +270,7 @@ class Goal(models.Model):
     class Meta:
         verbose_name = 'Цель'
         verbose_name_plural = 'Цели'
-        ordering = ['-percent']
+        ordering = ['amount']
 
     title = models.CharField(
         max_length=256,

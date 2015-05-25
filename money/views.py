@@ -60,11 +60,6 @@ class OperationCreate(CreateView):
         context['account'] = self.account
         return context
 
-    def form_valid(self, form):
-        form.instance.account = self.account
-        form.instance.user = self.user
-        return super(OperationCreate, self).form_valid(form)
-
 
 class TransferCreate(CreateView):
     form_class = TransferForm

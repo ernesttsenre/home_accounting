@@ -14,17 +14,12 @@
     <form action="{% url 'money:create_transfer' %}" method="post">
         {% csrf_token %}
 
-        {% if form.errors %}
-            <div class="alert alert-danger">
-                {{ form.errors }}
-            </div>
-        {% endif %}
-
         {% for field in form %}
             {% if not field.is_hidden %}
-                <div class="form-group">
+                <div class="form-group {% if field.errors %}has-error{% endif %}">
                     <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                     {{ field }}
+                    <p class="help-block">{{ field.errors.as_text }}</p>
                 </div>
             {% endif %}
         {% endfor %}

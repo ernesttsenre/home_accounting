@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.humanize.templatetags.humanize import intcomma
 from django.db.models.signals import post_save, post_delete
 from django.core import validators
+from django.core.exceptions import ValidationError
 import easy
 
 
@@ -130,6 +131,19 @@ class Transfer(models.Model):
     def get_name(self):
         return "Перевод с счета: %s, на счет: %s" % (self.account_from.title, self.account_to.title)
 
+    def clean(self):
+        if self.account_from == self.account_to:
+            raise ValidationError({
+                'account_to': 'Перевод не выполнен - нельзя переводить деньги на тот же счет'
+            })
+
+        account_from_balance = self.account_from.balance
+        yet = account_from_balance - self.amount
+        if yet < 0:
+            raise ValidationError({
+                'amount': 'Перевод не выполнен - недостаточно средств'
+            })
+
     def __str__(self):
         return self.get_name()
 
@@ -232,6 +246,15 @@ class Operation(models.Model):
         if self.transfer:
             return True
         return False
+
+    def clean(self):
+        if self.type == Operation.CREDIT_OPERATION:
+            account_balance = self.account.balance
+            yet = account_balance - self.amount
+            if yet < 0:
+                raise ValidationError({
+                    'type': 'Операция не возможна - недостаточно средств'
+                })
 
     def __str__(self):
         return self.get_name()

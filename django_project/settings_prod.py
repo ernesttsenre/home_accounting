@@ -21,6 +21,7 @@ LOCALE_PATHS = (BASE_DIR + '/locale',)
 
 TEMPLATE_CONTEXT_PROCESSORS = TCP + (
     'django.core.context_processors.request',
+    'money.context_processors.global_vars',
 )
 
 # Quick-start development settings - unsuitable for production

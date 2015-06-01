@@ -1,3 +1,6 @@
+import datetime
+import easy
+
 from django.db import models
 from django.db.models import Sum, F, FloatField
 from django.contrib.auth.models import User
@@ -5,7 +8,6 @@ from django.contrib.humanize.templatetags.humanize import intcomma
 from django.db.models.signals import post_save, post_delete
 from django.core import validators
 from django.core.exceptions import ValidationError
-import easy
 
 
 class Account(models.Model):
@@ -267,6 +269,23 @@ class Operation(models.Model):
         if errors:
             raise ValidationError(errors)
 
+    @staticmethod
+    def get_credit_amount_by_week():
+        date = datetime.date.today()
+        start_week = date - datetime.timedelta(date.weekday())
+        end_week = start_week + datetime.timedelta(7)
+
+        amount = 0
+        items = Operation.objects.filter(
+            created_at__range=[start_week, end_week],
+            type=Operation.CREDIT_OPERATION,
+            transfer=None
+        )
+        for item in items:
+            amount += item.amount
+
+        return amount
+
     def __str__(self):
         return self.get_name()
 
@@ -329,6 +348,34 @@ class Goal(models.Model):
             return 'info'
 
 
+class Param(models.Model):
+    class Meta:
+        verbose_name = 'Параметр'
+        verbose_name_plural = 'Параметры'
+
+    title = models.CharField(max_length=256, verbose_name='Название')
+    key = models.CharField(max_length=256, verbose_name='Ключ')
+    value = models.CharField(max_length=512, verbose_name='Значение')
+
+    @staticmethod
+    def _get_params():
+        params = {}
+        items = Param.objects.all()
+
+        for item in items:
+            params[item.key] = item.value
+
+        return params
+
+    @staticmethod
+    def get_param(key):
+        params = Param._get_params()
+        if params[key]:
+            return params[key]
+
+        return None
+
+
 def create_transfer_operations(sender, instance, **kwargs):
     Operation.objects.filter(transfer_id=instance.id).delete()
 
@@ -347,7 +394,6 @@ def create_transfer_operations(sender, instance, **kwargs):
     debit_operation.amount = instance.amount
     debit_operation.type = Operation.DEBIT_OPERATION
     debit_operation.save()
-
 
 def create_operation(sender, instance, **kwargs):
     instance.account.balance = instance.account.get_balance()

@@ -1,6 +1,5 @@
 from django.contrib import admin
-from django.db import models
-from money.models import Account, Category, Operation, Goal, Transfer
+from money.models import Account, Category, Operation, Goal, Transfer, Param
 import easy
 
 admin.site.site_header = 'Управление счетами'
@@ -54,8 +53,13 @@ class TransferAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
 
 
+class ParamAdmin(admin.ModelAdmin):
+    list_display = ('title', 'value')
+
+
 admin.site.register(Account, AccountAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Operation, OperationAdmin)
 admin.site.register(Goal, GoalAdmin)
 admin.site.register(Transfer, TransferAdmin)
+admin.site.register(Param, ParamAdmin)

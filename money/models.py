@@ -76,6 +76,11 @@ class Category(models.Model):
         verbose_name='Название'
     )
 
+    affected_limit = models.BooleanField(
+        verbose_name='Влияет на лимиты?',
+        default=True
+    )
+
     created_at = models.DateTimeField(
         verbose_name='Создан',
         auto_now_add=True
@@ -279,7 +284,8 @@ class Operation(models.Model):
         items = Operation.objects.filter(
             created_at__range=[start_week, end_week],
             type=Operation.CREDIT_OPERATION,
-            transfer=None
+            transfer=None,
+            category__affected_limit=True
         )
         for item in items:
             amount += item.amount

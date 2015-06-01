@@ -70,6 +70,7 @@ class Category(models.Model):
     class Meta:
         verbose_name = 'Основание'
         verbose_name_plural = 'Основания'
+        ordering = ['title']
 
     title = models.CharField(
         max_length=256,

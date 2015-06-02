@@ -88,13 +88,14 @@ class OperationMonthArchiveView(MonthArchiveView):
         month = self.get_month()
         data = Operation.objects.get_credit_week_report(year, month)
 
-        data['categories'] = json.dumps(data['categories'])
-        data['data'] = json.dumps(data['data'])
-        context['graph'] = data
+        jsonData = {}
+        jsonData['categories'] = json.dumps(data['categories'])
+        jsonData['data'] = json.dumps(data['data'])
+        context['graph'] = jsonData
 
         template_globals = global_vars(self.request)
         context['limit'] = template_globals['week_credit']['limit']
-        context['amount'] = template_globals['week_credit']['amount']
+        context['amount'] = int(sum(data['data']))
 
         max = context['limit']
         if context['amount'] >= context['limit']:

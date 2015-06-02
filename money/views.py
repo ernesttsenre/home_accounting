@@ -96,10 +96,6 @@ class OperationMonthArchiveView(MonthArchiveView):
         template_globals = global_vars(self.request)
         context['limit'] = template_globals['week_credit']['limit']
         context['amount'] = int(sum(data['data']))
-
-        max = context['limit']
-        if context['amount'] >= context['limit']:
-            max = context['amount'] + 500
-        context['max'] = max
+        context['max'] = max(context['limit'], context['amount'])
 
         return context

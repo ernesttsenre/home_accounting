@@ -7,13 +7,15 @@ class OperationQuerySet(models.QuerySet):
     def debit_operations(self):
         return self.filter(
             type=1,
-            transfer_id__isnull=True
+            transfer_id__isnull=True,
+            category__affected_limit=True
         )
 
     def credit_operations(self):
         return self.filter(
             type=-1,
-            transfer_id__isnull=True
+            transfer_id__isnull=True,
+            category__affected_limit=True
         )
 
     def get_credit_report_by_week(self, year, month):

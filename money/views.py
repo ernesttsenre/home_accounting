@@ -90,10 +90,15 @@ class OperationMonthArchiveView(MonthArchiveView):
 
         data['categories'] = json.dumps(data['categories'])
         data['data'] = json.dumps(data['data'])
+        context['graph'] = data
 
         template_globals = global_vars(self.request)
         context['limit'] = template_globals['week_credit']['limit']
         context['amount'] = template_globals['week_credit']['amount']
 
-        context['graph'] = data
+        max = context['limit']
+        if context['amount'] >= context['limit']:
+            max = context['amount'] + 500
+        context['max'] = max
+
         return context

@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+
+{% block content %}
+    <br/>
+
+    <ol class="breadcrumb">
+        <li><a href="{% url 'money:index' %}">Счета</a></li>
+    </ol>
+
+    <div class="lead clearfix">
+        <div class="pull-left">
+            {{ month|date:"F Y" }}
+        </div>
+        <div class="pull-right text-info">
+            {{ amount | intcomma }}
+        </div>
+    </div>
+
+    <nav>
+        <ul class="pager">
+            {% if previous_month %}
+                <li>
+                    <a href="{% url 'money:operation_month_archive' previous_month.year previous_month.month %}">
+                        <i class="glyphicon glyphicon-chevron-left"></i>
+                        {{ previous_month|date:"F Y" }}
+                    </a>
+                </li>
+            {% endif %}
+
+            {% if next_month %}
+                <li>
+                    <a href="{% url 'money:operation_month_archive' next_month.year next_month.month %}">
+                        {{ next_month|date:"F Y" }}
+                        <i class="glyphicon glyphicon-chevron-right"></i>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="lead">Недельные траты</div>
+    <div id="container" style="height: 300px; margin: 0 auto"></div>
+
+    {% if object_list %}
+        <div class="lead">Список операций</div>
+        <div class="list-group">
+            {% for operation in object_list %}
+                <a href="{% url 'money:operation' operation.id %}" class="list-group-item">
+                    <div class="row">
+                        <div class="col-xs-8">
+                            <span class="text-{{ operation.get_color }}">
+                                {{ operation.get_category_title }}
+                            </span>
+
+                            <br/>
+
+                            <small>
+                                {{ operation.user.first_name }},
+                                {{ operation.created_at | naturalday }}
+                            </small>
+                        </div>
+                        <div class="col-xs-4 text-right">
+                            <span class="label label-{{ operation.get_color }}">{{ operation.get_amount | intcomma }}</span>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        В этом месяце ещё нет операций
+    {% endif %}
+{% endblock %}
+
+{% block js %}
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+    <script>
+        $(function () {
+            $('#container').highcharts({
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: ''
+                },
+                exporting: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: {{ graph.categories | safe }},
+                    title: {
+                        text: ''
+                    }
+                },
+                yAxis: {
+                    min: 0,
+                    max: {% if amount < limit %} {{ limit }} {% else %} {{ amount }} {% endif %},
+                    title: {
+                        text: ''
+                    },
+                    labels: {
+                        enabled: false
+                    },
+                    plotLines: [{
+                        value: {{ limit }},
+                        color: 'red',
+                        width: 1,
+                        zIndex: 999
+                    }]
+                },
+                plotOptions: {
+                    column: {
+                        pointPadding: 0.2,
+                        borderWidth: 0
+                    }
+                },
+                legend: {
+                    enabled: false
+                },
+                tooltip: {
+                    enabled: false
+                },
+                series: [{
+                    name: 'Недельный расход',
+                    data: {{ graph.data }},
+                    dataLabels: {
+                        enabled: true
+                    }
+                }]
+            });
+        });
+    </script>
+{% endblock %}

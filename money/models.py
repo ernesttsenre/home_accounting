@@ -1,8 +1,12 @@
+import json
 import datetime
 import easy
 
+from money.managers import OperationManager
+
 from django.db import models
-from django.db.models import Sum, F, FloatField
+from django.db import connection
+from django.db.models import Count, Sum, F, FloatField
 from django.contrib.auth.models import User
 from django.contrib.humanize.templatetags.humanize import intcomma
 from django.db.models.signals import post_save, post_delete
@@ -168,6 +172,8 @@ class Operation(models.Model):
         verbose_name = 'Транзакция'
         verbose_name_plural = 'Транзакции'
 
+    objects = OperationManager()
+
     CREDIT_OPERATION = -1
     DEBIT_OPERATION = 1
     OPERATION_TYPES = (
@@ -276,7 +282,7 @@ class Operation(models.Model):
             raise ValidationError(errors)
 
     @staticmethod
-    def get_credit_amount_by_week():
+    def get_credit_amount_by_this_week():
         date = datetime.date.today()
         start_week = date - datetime.timedelta(date.weekday())
         end_week = start_week + datetime.timedelta(7)
@@ -285,7 +291,7 @@ class Operation(models.Model):
         items = Operation.objects.filter(
             created_at__range=[start_week, end_week],
             type=Operation.CREDIT_OPERATION,
-            transfer=None,
+            transfer_id__isnull=True,
             category__affected_limit=True
         )
         for item in items:
@@ -401,6 +407,7 @@ def create_transfer_operations(sender, instance, **kwargs):
     debit_operation.amount = instance.amount
     debit_operation.type = Operation.DEBIT_OPERATION
     debit_operation.save()
+
 
 def create_operation(sender, instance, **kwargs):
     instance.account.balance = instance.account.get_balance()

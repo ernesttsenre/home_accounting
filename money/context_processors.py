@@ -1,14 +1,18 @@
+from datetime import datetime, timedelta
+
 from money.models import Operation, Param
 
 
 def global_vars(request):
     return {
+        'current_year': datetime.now().year,
+        'current_month': datetime.now().month,
         'week_credit': get_week_credit_amount()
     }
 
 
 def get_week_credit_amount():
-    credit_amount = Operation.get_credit_amount_by_week()
+    credit_amount = Operation.get_credit_amount_by_this_week()
     credit_limit = Param.get_param('week_credit_amount_limit')
 
     credit_percent = 0

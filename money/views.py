@@ -1,4 +1,7 @@
-from django.views.generic import ListView, DetailView, CreateView
+import json
+from money.context_processors import global_vars
+
+from django.views.generic import MonthArchiveView, ListView, DetailView, CreateView
 from django.shortcuts import get_object_or_404
 from money.models import Operation, Account, Goal, Transfer
 from money.forms import OperationForm, TransferForm
@@ -69,3 +72,28 @@ class TransferCreate(CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super(TransferCreate, self).form_valid(form)
+
+
+class OperationMonthArchiveView(MonthArchiveView):
+    queryset = Operation.objects.credits()
+    date_field = 'created_at'
+    allow_future = True
+    template_name = 'money/archive/operation_month.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(OperationMonthArchiveView, self).get_context_data(**kwargs)
+
+        # раздобудем данные для графика
+        year = self.get_year()
+        month = self.get_month()
+        data = Operation.objects.get_credit_week_report(year, month)
+
+        data['categories'] = json.dumps(data['categories'])
+        data['data'] = json.dumps(data['data'])
+
+        template_globals = global_vars(self.request)
+        context['limit'] = template_globals['week_credit']['limit']
+        context['amount'] = template_globals['week_credit']['amount']
+
+        context['graph'] = data
+        return context

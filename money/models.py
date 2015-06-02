@@ -299,6 +299,9 @@ class Operation(models.Model):
 
         return amount
 
+    def get_created_week(self):
+        return self.created_at.isocalendar()[1]
+
     def __str__(self):
         return self.get_name()
 

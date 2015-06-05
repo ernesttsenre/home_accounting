@@ -137,7 +137,7 @@ class Account(models.Model):
                     extract(YEAR FROM money_operation.created_at) = %s AND
                     extract(%s FROM money_operation.created_at) = %s AND
                     money_operation.account_id = %s AND
-                    transfer_id IS NOT NULL
+                    money_operation.transfer_id IS NOT NULL
             ''', [year, self.debit_limit_period, condition, self.id])
 
             rows = cursor.fetchone()
@@ -224,17 +224,30 @@ class Account(models.Model):
                 WHERE money_operation.type = -1 AND
                     extract(YEAR FROM money_operation.created_at) = %s AND
                     extract(%s FROM money_operation.created_at) = %s AND
-                    money_operation.account_id = %s
+                    money_operation.account_id = %s AND
+                    money_operation.transfer_id IS NULL
             ''', [year, self.credit_limit_period, condition, self.id])
 
             rows = cursor.fetchone()
 
-            current_credit = 0
+            credit_by_transaction = 0
             if len(rows) > 0 and rows[0]:
-                current_credit = rows[0]
+                credit_by_transaction = rows[0]
 
-            available = self.credit_limit - current_credit
-            return available
+            transfer_amount = self.get_transfer_balance_by_period(self.credit_limit_period)
+            if transfer_amount > 0 or not transfer_amount:
+                transfer_amount = 0
+            else:
+                transfer_amount = abs(transfer_amount)
+
+            credit_by_period = credit_by_transaction + transfer_amount
+
+            # Текущий доступный лимит
+            current_credit_limit = self.credit_limit - credit_by_period
+            if current_credit_limit < 0:
+                current_credit_limit = 0
+
+            return current_credit_limit
         finally:
             cursor.close()
 

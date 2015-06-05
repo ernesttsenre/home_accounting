@@ -245,8 +245,12 @@ class Operation(models.Model):
 
     created_at = models.DateTimeField(
         verbose_name='Создан',
-        auto_now_add=True
     )
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.created_at = datetime.datetime.today()
+        return super(Operation, self).save(*args, **kwargs)
 
     def get_amount(self):
         return str(self.amount * self.type)

@@ -30,7 +30,7 @@
                             </div>
                         </div>
 
-                        {% if account.get_available_credit_amount or account.get_available_debit_amount %}
+                        {% if account.get_available_credit_amount != None or account.get_available_debit_amount != None %}
                             <small>
                                 ограничения:
                                 {% if account.get_available_debit_amount %}

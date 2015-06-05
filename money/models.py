@@ -118,10 +118,8 @@ class Account(models.Model):
         return self.id == int(accumulation_id)
 
     def get_available_debit_amount(self):
-        if self.balance >= self.debit_limit:
-            return 0
-
-        limit = self.debit_limit - self.balance
+        if not self.debit_limit:
+            return None
 
         cursor = connection.cursor()
         try:
@@ -150,10 +148,12 @@ class Account(models.Model):
             if len(rows) > 0:
                 current_debit = rows[0]
 
-            available = 0
-            if limit > current_debit:
-                available = limit - current_debit
+            before_account_limit = self.debit_limit
+            if self.debit_limit > self.balance:
+                before_account_limit = self.debit_limit - self.balance
+            yet = self.debit_limit - current_debit
 
+            available = min(before_account_limit, yet)
             return available
         finally:
             cursor.close()
@@ -161,11 +161,6 @@ class Account(models.Model):
     def get_available_credit_amount(self):
         if not self.credit_limit:
             return None
-
-        if self.balance >= self.debit_limit:
-            return 0
-
-        limit = self.credit_limit - self.balance
 
         cursor = connection.cursor()
         try:
@@ -191,13 +186,10 @@ class Account(models.Model):
             rows = cursor.fetchone()
 
             current_credit = 0
-            if len(rows) > 0:
+            if len(rows) > 0 and rows[0]:
                 current_credit = rows[0]
 
-            available = 0
-            if limit > current_credit:
-                available = limit - current_credit
-
+            available = self.credit_limit - current_credit
             return available
         finally:
             cursor.close()

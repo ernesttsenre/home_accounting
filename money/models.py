@@ -148,12 +148,7 @@ class Account(models.Model):
             if len(rows) > 0:
                 current_debit = rows[0]
 
-            before_account_limit = self.debit_limit
-            if self.debit_limit > self.balance:
-                before_account_limit = self.debit_limit - self.balance
-            yet = self.debit_limit - current_debit
-
-            available = min(before_account_limit, yet)
+            available = self.debit_limit - current_debit
             return available
         finally:
             cursor.close()

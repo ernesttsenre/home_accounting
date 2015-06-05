@@ -131,7 +131,7 @@ class Account(models.Model):
 
             cursor.execute('''
                 SELECT
-                  sum(money_operation.amount)
+                  sum(money_operation.amount * money_operation.type)
                 FROM money_operation
                 WHERE
                     extract(YEAR FROM money_operation.created_at) = %s AND

@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from money.models import Operation, Param
+from money.models import Operation, Param, Account
 
 
 def global_vars(request):

@@ -5,9 +5,29 @@ import easy
 admin.site.site_header = 'Управление счетами'
 
 
+class AccountInline(admin.TabularInline):
+    model = Account
+    suit_classes = 'suit-tab suit-tab-cities'
+
+
 class AccountAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {
+            'classes': ('suit-tab', 'suit-tab-general',),
+            'fields': ('title',)
+        }),
+        ('Лимит пополнения', {
+            'classes': ('suit-tab', 'suit-tab-limits',),
+            'fields': ('debit_limit', 'debit_limit_period',)
+        }),
+        ('Лимит списания', {
+            'classes': ('suit-tab', 'suit-tab-limits',),
+            'fields': ('credit_limit', 'credit_limit_period',)
+        })
+    )
     list_display = ('title', 'balance', 'created_at')
     date_hierarchy = 'created_at'
+    suit_form_tabs = (('general', 'Основное'), ('limits', 'Лимиты'))
 
     actions = ('recalculate_action',)
 

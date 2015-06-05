@@ -20,6 +20,15 @@ class Account(models.Model):
         verbose_name_plural = 'Счета'
         ordering = ['-balance']
 
+    PERIOD_MONTH = 'month'
+    PERIOD_WEEK = 'week'
+    PERIOD_DAY = 'day'
+    PERIOD_CHOICES = (
+        (PERIOD_MONTH, 'Месяц'),
+        (PERIOD_WEEK, 'Неделя'),
+        (PERIOD_DAY, 'День'),
+    )
+
     title = models.CharField(
         max_length=256,
         verbose_name='Название'
@@ -34,6 +43,44 @@ class Account(models.Model):
         validators=[
             validators.MinValueValidator(0, 'Недостаточно средств на счете')
         ]
+    )
+
+    credit_limit = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name='Сумма',
+        null=True,
+        blank=True,
+        validators=[
+            validators.MinValueValidator(1000, 'Если лимит есть, то он не может быть менее 1000')
+        ]
+    )
+
+    credit_limit_period = models.CharField(
+        max_length=10,
+        choices=PERIOD_CHOICES,
+        verbose_name='За какой период?',
+        null=True,
+        blank=True
+    )
+
+    debit_limit = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name='Сумма',
+        null=True,
+        blank=True,
+        validators=[
+            validators.MinValueValidator(1000, 'Если лимит есть, то он не может быть менее 1000')
+        ]
+    )
+
+    debit_limit_period = models.CharField(
+        max_length=10,
+        choices=PERIOD_CHOICES,
+        verbose_name='За какой период?',
+        null=True,
+        blank=True
     )
 
     created_at = models.DateTimeField(
@@ -69,6 +116,91 @@ class Account(models.Model):
     def is_accumulation(self):
         accumulation_id = Param.get_param('accumulation_account')
         return self.id == int(accumulation_id)
+
+    def get_available_debit_amount(self):
+        if self.balance >= self.debit_limit:
+            return 0
+
+        limit = self.debit_limit - self.balance
+
+        cursor = connection.cursor()
+        try:
+            date = datetime.datetime.now()
+            year = date.year
+
+            condition = date.month
+            if self.debit_limit_period == 'week':
+                condition = date.isocalendar()[1]
+            elif self.debit_limit_period == 'day':
+                condition = date.today()
+
+            cursor.execute('''
+                SELECT
+                  sum(money_operation.amount)
+                FROM money_operation
+                WHERE money_operation.type = 1 AND
+                    extract(YEAR FROM money_operation.created_at) = %s AND
+                    extract(%s FROM money_operation.created_at) = %s AND
+                    money_operation.account_id = %s
+            ''', [year, self.debit_limit_period, condition, self.id])
+
+            rows = cursor.fetchone()
+
+            current_debit = 0
+            if len(rows) > 0:
+                current_debit = rows[0]
+
+            available = 0
+            if limit > current_debit:
+                available = limit - current_debit
+
+            return available
+        finally:
+            cursor.close()
+
+    def get_available_credit_amount(self):
+        if not self.credit_limit:
+            return None
+
+        if self.balance >= self.debit_limit:
+            return 0
+
+        limit = self.credit_limit - self.balance
+
+        cursor = connection.cursor()
+        try:
+            date = datetime.datetime.now()
+            year = date.year
+
+            condition = date.month
+            if self.credit_limit_period == 'week':
+                condition = date.isocalendar()[1]
+            elif self.credit_limit_period == 'day':
+                condition = date.today()
+
+            cursor.execute('''
+                SELECT
+                  sum(money_operation.amount)
+                FROM money_operation
+                WHERE money_operation.type = -1 AND
+                    extract(YEAR FROM money_operation.created_at) = %s AND
+                    extract(%s FROM money_operation.created_at) = %s AND
+                    money_operation.account_id = %s
+            ''', [year, self.credit_limit_period, condition, self.id])
+
+            rows = cursor.fetchone()
+
+            current_credit = 0
+            if len(rows) > 0:
+                current_credit = rows[0]
+
+            available = 0
+            if limit > current_credit:
+                available = limit - current_credit
+
+            return available
+        finally:
+            cursor.close()
 
     @staticmethod
     def get_total_amount():

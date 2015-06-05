@@ -3,6 +3,7 @@ import datetime
 from django.db import models
 from django.db import connection
 
+
 class OperationQuerySet(models.QuerySet):
     def debit_operations(self):
         return self.filter(
@@ -18,7 +19,7 @@ class OperationQuerySet(models.QuerySet):
             category__affected_limit=True
         )
 
-    def get_credit_report_by_week(self, year, month):
+    def get_credit_by_week(self, year, month):
         cursor = connection.cursor()
         try:
             cursor.execute('''
@@ -57,4 +58,4 @@ class OperationManager(models.Manager):
         return self.get_queryset().credit_operations()
 
     def get_credit_week_report(self, year, month):
-        return self.get_queryset().get_credit_report_by_week(year, month)
+        return self.get_queryset().get_credit_by_week(year, month)

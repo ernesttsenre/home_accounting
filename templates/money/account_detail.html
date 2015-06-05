@@ -12,6 +12,20 @@
     <div class="lead clearfix">
         <div class="pull-left">
             {{ account.title }}
+
+            {% if account.get_available_credit_amount or account.get_available_debit_amount %}
+                <br/>
+                <small>
+                    Ограничения:
+                    {% if account.get_available_debit_amount %}
+                        <span class="text-success">+{{ account.get_available_debit_amount | intcomma }}</span>
+                    {% endif %}
+
+                    {% if account.get_available_credit_amount %}
+                        и <span class="text-danger">-{{ account.get_available_credit_amount | intcomma }}</span>
+                    {% endif %}
+                </small>
+            {% endif %}
         </div>
         <div class="pull-right text-info">
             {{ account.balance | intcomma }}

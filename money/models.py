@@ -190,6 +190,8 @@ class Account(models.Model):
 
             # Текущий доступный лимит
             current_debit_limit = self.debit_limit - debit_by_period
+            if current_debit_limit < 0:
+                current_debit_limit = 0
 
             # Остаток на счете
             account_debit_limit = 0

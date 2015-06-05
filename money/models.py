@@ -66,6 +66,19 @@ class Account(models.Model):
         balance_string = intcomma(self.balance)
         return "%s (%s %s)" % (self.title, balance_string, 'руб.')
 
+    def is_accumulation(self):
+        accumulation_id = Param.get_param('accumulation_account')
+        return self.id == int(accumulation_id)
+
+    @staticmethod
+    def get_total_amount():
+        total = 0
+        accounts = Account.objects.all()
+        for account in accounts:
+            if not account.is_accumulation():
+                total += account.balance
+        return total
+
     def __str__(self):
         return self.get_name()
 
@@ -374,7 +387,7 @@ class Param(models.Model):
     value = models.CharField(max_length=512, verbose_name='Значение')
 
     @staticmethod
-    def _get_params():
+    def get_params():
         params = {}
         items = Param.objects.all()
 
@@ -385,7 +398,7 @@ class Param(models.Model):
 
     @staticmethod
     def get_param(key):
-        params = Param._get_params()
+        params = Param.get_params()
         if params[key]:
             return params[key]
 

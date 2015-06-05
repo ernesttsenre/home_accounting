@@ -17,11 +17,7 @@ class AccountList(ListView):
         goals = Goal.objects.all()
         context['goals'] = goals
 
-        total_balance = 0
-        accounts = self.model.objects.all()
-        for account in accounts:
-            total_balance += account.get_balance()
-
+        total_balance = Account.get_total_amount()
         context['total'] = total_balance
         return context
 

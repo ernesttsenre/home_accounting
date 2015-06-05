@@ -5,6 +5,7 @@ from money.models import Operation, Param
 
 def global_vars(request):
     return {
+        'settings': Param.get_params(),
         'current_year': datetime.now().year,
         'current_month': datetime.now().month,
         'week_credit': get_week_credit_amount()

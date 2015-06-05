@@ -17,18 +17,20 @@
     {% if object_list %}
         <div class="list-group">
             {% for account in object_list %}
-                <a href="{% url 'money:account' account.id %}" class="list-group-item">
-                    <div class="row">
-                        <div class="col-xs-8">
-                            <span class="text-{{ account.get_color }}">
-                                {{ account.title }}
-                            </span>
+                {% if not account.is_accumulation %}
+                    <a href="{% url 'money:account' account.id %}" class="list-group-item">
+                        <div class="row">
+                            <div class="col-xs-8">
+                                <span class="text-{{ account.get_color }}">
+                                    {{ account.title }}
+                                </span>
+                            </div>
+                            <div class="col-xs-4 text-right">
+                                <span class="label label-{{ account.get_color }}">{{ account.balance | intcomma }}</span>
+                            </div>
                         </div>
-                        <div class="col-xs-4 text-right">
-                            <span class="label label-{{ account.get_color }}">{{ account.balance | intcomma }}</span>
-                        </div>
-                    </div>
-                </a>
+                    </a>
+                {% endif %}
             {% endfor %}
         </div>
     {% else %}

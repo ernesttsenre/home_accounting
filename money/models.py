@@ -117,6 +117,39 @@ class Account(models.Model):
         accumulation_id = Param.get_param('accumulation_account')
         return self.id == int(accumulation_id)
 
+    def get_transfer_balance_by_period(self, period):
+        cursor = connection.cursor()
+        try:
+            date = datetime.datetime.now()
+            year = date.year
+
+            condition = date.month
+            if period == 'week':
+                condition = date.isocalendar()[1]
+            elif period == 'day':
+                condition = date.today()
+
+            cursor.execute('''
+                SELECT
+                  sum(money_operation.amount)
+                FROM money_operation
+                WHERE
+                    extract(YEAR FROM money_operation.created_at) = %s AND
+                    extract(%s FROM money_operation.created_at) = %s AND
+                    money_operation.account_id = %s AND
+                    transfer_id IS NOT NULL
+            ''', [year, self.debit_limit_period, condition, self.id])
+
+            rows = cursor.fetchone()
+
+            amount = 0
+            if len(rows) > 0:
+                amount = rows[0]
+
+            return amount
+        finally:
+            cursor.close()
+
     def get_available_debit_amount(self):
         if not self.debit_limit:
             return None
@@ -139,17 +172,31 @@ class Account(models.Model):
                 WHERE money_operation.type = 1 AND
                     extract(YEAR FROM money_operation.created_at) = %s AND
                     extract(%s FROM money_operation.created_at) = %s AND
-                    money_operation.account_id = %s
+                    money_operation.account_id = %s AND
+                    money_operation.transfer_id IS NULL
             ''', [year, self.debit_limit_period, condition, self.id])
 
             rows = cursor.fetchone()
 
-            current_debit = 0
+            debit_by_transaction = 0
             if len(rows) > 0:
-                current_debit = rows[0]
+                debit_by_transaction = rows[0]
 
-            available = self.debit_limit - current_debit
-            return available
+            transfer_amount = self.get_transfer_balance_by_period(self.debit_limit_period)
+            if transfer_amount < 0:
+                transfer_amount = 0
+
+            debit_by_period = debit_by_transaction + transfer_amount
+
+            # Текущий доступный лимит
+            current_debit_limit = self.debit_limit - debit_by_period
+
+            # Остаток на счете
+            account_debit_limit = 0
+            if self.debit_limit > self.balance:
+                account_debit_limit = self.debit_limit - self.balance
+
+            return min(current_debit_limit, account_debit_limit)
         finally:
             cursor.close()
 

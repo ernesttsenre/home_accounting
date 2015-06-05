@@ -289,11 +289,12 @@ class Operation(models.Model):
         super(Operation, self).clean()
         errors = {}
 
-        if self.type == Operation.CREDIT_OPERATION:
-            account_balance = self.account.balance
-            yet = account_balance - self.amount
-            if yet < 0:
-                errors['type'] = 'Операция не возможна - недостаточно средств'
+        if not self.id:
+            if self.type == Operation.CREDIT_OPERATION:
+                account_balance = self.account.balance
+                yet = account_balance - self.amount
+                if yet < 0:
+                    errors['type'] = 'Операция не возможна - недостаточно средств'
 
         if errors:
             raise ValidationError(errors)

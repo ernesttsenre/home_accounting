@@ -179,7 +179,7 @@ class Account(models.Model):
             rows = cursor.fetchone()
 
             debit_by_transaction = 0
-            if len(rows) > 0:
+            if len(rows) > 0 and rows[0]:
                 debit_by_transaction = rows[0]
 
             transfer_amount = self.get_transfer_balance_by_period(self.debit_limit_period)

@@ -20,15 +20,6 @@ class Account(models.Model):
         verbose_name_plural = 'Счета'
         ordering = ['-balance']
 
-    PERIOD_MONTH = 'month'
-    PERIOD_WEEK = 'week'
-    PERIOD_DAY = 'day'
-    PERIOD_CHOICES = (
-        (PERIOD_MONTH, 'Месяц'),
-        (PERIOD_WEEK, 'Неделя'),
-        (PERIOD_DAY, 'День'),
-    )
-
     title = models.CharField(
         max_length=256,
         verbose_name='Название'
@@ -43,44 +34,6 @@ class Account(models.Model):
         validators=[
             validators.MinValueValidator(0, 'Недостаточно средств на счете')
         ]
-    )
-
-    credit_limit = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        verbose_name='Сумма',
-        null=True,
-        blank=True,
-        validators=[
-            validators.MinValueValidator(1000, 'Если лимит есть, то он не может быть менее 1000')
-        ]
-    )
-
-    credit_limit_period = models.CharField(
-        max_length=10,
-        choices=PERIOD_CHOICES,
-        verbose_name='За какой период?',
-        null=True,
-        blank=True
-    )
-
-    debit_limit = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        verbose_name='Сумма',
-        null=True,
-        blank=True,
-        validators=[
-            validators.MinValueValidator(1000, 'Если лимит есть, то он не может быть менее 1000')
-        ]
-    )
-
-    debit_limit_period = models.CharField(
-        max_length=10,
-        choices=PERIOD_CHOICES,
-        verbose_name='За какой период?',
-        null=True,
-        blank=True
     )
 
     created_at = models.DateTimeField(
@@ -116,91 +69,6 @@ class Account(models.Model):
     def is_accumulation(self):
         accumulation_id = Param.get_param('accumulation_account')
         return self.id == int(accumulation_id)
-
-    def get_transfer_balance_by_period(self, period):
-        cursor = connection.cursor()
-        try:
-            date = datetime.datetime.now()
-            year = date.year
-
-            condition = date.month
-            if period == 'week':
-                condition = date.isocalendar()[1]
-            elif period == 'day':
-                condition = date.today()
-
-            cursor.execute('''
-                SELECT
-                  sum(money_operation.amount * money_operation.type)
-                FROM money_operation
-                WHERE
-                    extract(YEAR FROM money_operation.created_at) = %s AND
-                    extract(%s FROM money_operation.created_at) = %s AND
-                    money_operation.account_id = %s AND
-                    money_operation.transfer_id IS NOT NULL
-            ''', [year, self.debit_limit_period, condition, self.id])
-
-            rows = cursor.fetchone()
-
-            amount = 0
-            if len(rows) > 0:
-                amount = rows[0]
-
-            return amount
-        finally:
-            cursor.close()
-
-    def get_available_debit_amount(self):
-        if not self.debit_limit:
-            return None
-
-        cursor = connection.cursor()
-        try:
-            date = datetime.datetime.now()
-            year = date.year
-
-            condition = date.month
-            if self.debit_limit_period == 'week':
-                condition = date.isocalendar()[1]
-            elif self.debit_limit_period == 'day':
-                condition = date.today()
-
-            cursor.execute('''
-                SELECT
-                  sum(money_operation.amount)
-                FROM money_operation
-                WHERE money_operation.type = 1 AND
-                    extract(YEAR FROM money_operation.created_at) = %s AND
-                    extract(%s FROM money_operation.created_at) = %s AND
-                    money_operation.account_id = %s AND
-                    money_operation.transfer_id IS NULL
-            ''', [year, self.debit_limit_period, condition, self.id])
-
-            rows = cursor.fetchone()
-
-            debit_by_transaction = 0
-            if len(rows) > 0 and rows[0]:
-                debit_by_transaction = rows[0]
-
-            transfer_amount = self.get_transfer_balance_by_period(self.debit_limit_period)
-            if transfer_amount < 0 or not transfer_amount:
-                transfer_amount = 0
-
-            debit_by_period = debit_by_transaction + transfer_amount
-
-            # Текущий доступный лимит
-            current_debit_limit = self.debit_limit - debit_by_period
-            if current_debit_limit < 0:
-                current_debit_limit = 0
-
-            # Остаток на счете
-            account_debit_limit = 0
-            if self.debit_limit > self.balance:
-                account_debit_limit = self.debit_limit - self.balance
-
-            return min(current_debit_limit, account_debit_limit)
-        finally:
-            cursor.close()
 
     def get_available_credit_amount(self):
         if not self.credit_limit:
@@ -589,6 +457,109 @@ class Param(models.Model):
             return params[key]
 
         return None
+
+
+class PlanItem(models.Model):
+    class Meta:
+        verbose_name = 'Плановые траты'
+        verbose_name_plural = 'Плановые траты'
+        ordering = ['created_at', 'state']
+
+    PERIOD_MONTH = 'month'
+    PERIOD_WEEK = 'week'
+    PERIOD_OPTIONS = (
+        (PERIOD_MONTH, 'Каджый месяц'),
+        (PERIOD_WEEK, 'Каждую неделю'),
+    )
+
+    STATE_OPENED = 'opened'
+    STATE_CLOSED = 'closed'
+    STATE_OPTIONS = (
+        (STATE_OPENED, 'Открыта'),
+        (STATE_CLOSED, 'Выполнена'),
+    )
+
+    title = models.CharField(
+        max_length=256,
+        verbose_name='Название'
+    )
+    account = models.ForeignKey(
+        Account,
+        verbose_name='Счет'
+    )
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name='Сумма',
+        validators=[
+            validators.MinValueValidator(1, 'Сумма цели должна быть больше 0')
+        ]
+    )
+    period = models.CharField(
+        max_length=10,
+        choices=PERIOD_OPTIONS,
+        verbose_name='Повторять',
+        default=PERIOD_MONTH
+    )
+    state = models.CharField(
+        max_length=10,
+        choices=STATE_OPTIONS,
+        verbose_name='Состояние',
+        default=STATE_OPENED,
+        editable=False
+    )
+    alert_on_main = models.BooleanField(
+        verbose_name='Показывать напоминание на главном экране',
+        default=True
+    )
+    must_closed_at = models.DateTimeField(
+        verbose_name='Выполнить до',
+        editable=False
+    )
+    closed_at = models.DateTimeField(
+        verbose_name='Выполнена',
+        editable=False,
+        null=True,
+        blank=True
+    )
+    created_at = models.DateTimeField(
+        verbose_name='Создан',
+        auto_now_add=True
+    )
+
+    def mark_closed(self):
+        self.state = self.STATE_CLOSED
+        self.closed_at = datetime.datetime.now()
+
+    @easy.short(desc='Выполнено?', bool=True)
+    def is_closed(self):
+        return self.state == self.STATE_CLOSED
+
+    def calc_must_closed(self, from_closed=False):
+        if not from_closed:
+            date = datetime.datetime.now()
+        else:
+            date = self.must_closed_at
+
+        period = self.period
+        if period == self.PERIOD_MONTH:
+            month = date.month + 1
+            self.must_closed_at = datetime.date(date.year, month, 1)
+        elif period == self.PERIOD_WEEK:
+            self.must_closed_at = date + datetime.timedelta(week=1)
+
+    @staticmethod
+    def get_overdue():
+        return PlanItem.objects.filter(
+            closed_at__isnull=True,
+            must_closed_at__lt=datetime.datetime.now()
+        )
+
+    def save(self, *args, **kwargs):
+        if self.must_closed_at is None:
+            self.calc_must_closed()
+        return super(PlanItem, self).save(*args, **kwargs)
+
 
 
 def create_transfer_operations(sender, instance, **kwargs):

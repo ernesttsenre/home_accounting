@@ -1,4 +1,5 @@
 {% load static %}
+{% load humanize %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,6 +34,18 @@
 {% include 'report.html' %}
 
 <div class="container">
+    {% if plan_overdue %}
+        <br/>
+        <div class="alert alert-danger" style="margin-bottom: 0;">
+            Просрочены плановые траты:
+            <ul>
+                {% for item in plan_overdue %}
+                    <li>{{ item.title }}: {{ item.amount | intcomma }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
     {% block content %}{% endblock %}
 </div>
 

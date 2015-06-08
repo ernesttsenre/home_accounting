@@ -29,19 +29,6 @@
                                 <span class="label label-{{ account.get_color }}">{{ account.balance | intcomma }}</span>
                             </div>
                         </div>
-
-{#                        {% if account.get_available_credit_amount != None or account.get_available_debit_amount != None %}#}
-{#                            <small>#}
-{#                                ограничения:#}
-{#                                {% if account.get_available_debit_amount != None %}#}
-{#                                    <span class="text-success">+{{ account.get_available_debit_amount | intcomma }}</span>#}
-{#                                {% endif %}#}
-{##}
-{#                                {% if account.get_available_credit_amount != None %}#}
-{#                                    и <span class="text-danger">-{{ account.get_available_credit_amount | intcomma }}</span>#}
-{#                                {% endif %}#}
-{#                            </small>#}
-{#                        {% endif %}#}
                     </a>
                 {% endif %}
             {% endfor %}

@@ -14,7 +14,7 @@
             {% if user.is_authenticated %}
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="{% url 'money:create_transfer' %}">Создать перевод</a></li>
-                    <li><a href="{% url 'money:operation_month_archive' current_year current_month %}">Недельные траты</a></li>
+                    <li><a href="{% url 'money:operation_month_archive' current_year current_month %}">Отчет</a></li>
                     <li><a href="{% url 'accounts:logout' %}">Выйти</a></li>
                 </ul>
             {% endif %}

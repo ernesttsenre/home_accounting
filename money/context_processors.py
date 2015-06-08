@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta
 
-from money.models import Operation, Param, Account
+from money.models import Operation, Param, PlanItem
 
 
 def global_vars(request):
     return {
+        'plan_overdue': PlanItem.get_overdue(),
         'settings': Param.get_params(),
         'current_year': datetime.now().year,
         'current_month': datetime.now().month,

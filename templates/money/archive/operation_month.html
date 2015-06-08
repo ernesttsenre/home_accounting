@@ -15,6 +15,28 @@
             </h3>
         </div>
         <div class="panel-body">
+            <div id="container_week" style="height: 300px; margin: 0 auto"></div>
+        </div>
+    </div>
+
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                Категории трат
+            </h3>
+        </div>
+        <div class="panel-body">
+            <div id="container_month" style="height: 300px; margin: 0 auto"></div>
+        </div>
+    </div>
+
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                Транзакции
+            </h3>
+        </div>
+        <div class="panel-body">
             {% if object_list %}
                 <div class="list-group operations-list">
                     {% for operation in object_list %}
@@ -43,28 +65,6 @@
             {% else %}
                 В этом месяце ещё нет операций
             {% endif %}
-        </div>
-    </div>
-
-    <div class="panel panel-info">
-        <div class="panel-heading">
-            <h3 class="panel-title">
-                Траты по неделям
-            </h3>
-        </div>
-        <div class="panel-body">
-            <div id="container_week" style="height: 300px; margin: 0 auto"></div>
-        </div>
-    </div>
-
-    <div class="panel panel-info">
-        <div class="panel-heading">
-            <h3 class="panel-title">
-                Категории трат
-            </h3>
-        </div>
-        <div class="panel-body">
-            <div id="container_month" style="height: 300px; margin: 0 auto"></div>
         </div>
     </div>
 

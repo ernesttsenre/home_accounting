@@ -56,10 +56,10 @@ class OperationQuerySet(models.QuerySet):
                 FROM money_operation
                   INNER JOIN money_category ON money_category.id = money_operation.category_id AND money_category.affected_limit = TRUE
                 WHERE money_operation.type = -1 AND money_operation.transfer_id IS NULL AND
-                    extract(YEAR FROM money_operation.created_at) = 2015 AND
-                    extract(MONTH FROM money_operation.created_at) = 6
+                    extract(YEAR FROM money_operation.created_at) = %s AND
+                    extract(MONTH FROM money_operation.created_at) = %s
                 GROUP BY money_category.title
-            ''', [month, year])
+            ''', [year, month])
 
             items = cursor.fetchall()
             data = [[row[0], float(row[1])] for row in items]

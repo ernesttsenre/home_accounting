@@ -14,7 +14,7 @@ class AccountInline(admin.TabularInline):
 class AccountAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
-            'classes': ('suit-tab', 'suit-tab-general',),
+            # 'classes': ('suit-tab', 'suit-tab-general',),
             'fields': ('title',)
         }),
     )

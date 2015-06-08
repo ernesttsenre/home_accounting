@@ -54,7 +54,7 @@ class OperationQuerySet(models.QuerySet):
                   money_category.title,
                   sum(money_operation.amount)
                 FROM money_operation
-                  INNER JOIN money_category ON money_category.id = money_operation.category_id AND money_category.affected_limit = TRUE
+                  INNER JOIN money_category ON money_category.id = money_operation.category_id
                 WHERE money_operation.type = -1 AND money_operation.transfer_id IS NULL AND
                     extract(YEAR FROM money_operation.created_at) = %s AND
                     extract(MONTH FROM money_operation.created_at) = %s

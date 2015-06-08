@@ -44,13 +44,13 @@
                            data-week="{{ operation.get_created_week }}">
                             <div class="row">
                                 <div class="col-xs-8">
-                            <span class="text-{{ operation.get_color }}">
-                                {{ operation.get_category_title }}
-                            </span>
+                                    <span>
+                                        {{ operation.get_category_title }}
+                                    </span>
 
                                     <br/>
 
-                                    <small>
+                                    <small class="text-muted">
                                         {{ operation.user.first_name }},
                                         {{ operation.created_at | naturalday }}
                                     </small>

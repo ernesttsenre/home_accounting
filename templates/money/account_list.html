@@ -21,7 +21,7 @@
                             <a href="{% url 'money:account' account.id %}" class="list-group-item">
                                 <div class="row">
                                     <div class="col-xs-8">
-                                        <span class="text-{{ account.get_color }}">
+                                        <span>
                                             {{ account.title }}
                                         </span>
                                     </div>
@@ -54,7 +54,7 @@
                     {% for goal in goals %}
                         <li class="list-group-item">
                             <div class="row">
-                                <div class="col-xs-6 text-{{ goal.get_color }}">
+                                <div class="col-xs-6">
                                     {{ goal.title }}
                                 </div>
                                 <div class="col-xs-6 text-right">

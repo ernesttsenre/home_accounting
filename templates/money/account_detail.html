@@ -30,13 +30,13 @@
                         <a href="{% url 'money:operation' operation.id %}" class="list-group-item">
                             <div class="row">
                                 <div class="col-xs-8">
-                                    <span class="text-{{ operation.get_color }}">
+                                    <span>
                                         {{ operation.get_category_title }}
                                     </span>
 
                                     <br/>
 
-                                    <small>
+                                    <small class="text-muted">
                                         {{ operation.user.first_name }},
                                         {{ operation.created_at | naturalday }}
                                     </small>

@@ -186,26 +186,21 @@
                     enabled: false
                 },
                 legend: {
-                    enabled: false
+                    enabled: true
                 },
                 plotOptions: {
                     pie: {
                         allowPointSelect: true,
                         cursor: 'pointer',
                         dataLabels: {
-                            enabled: true,
-                            distance: -40,
-                            style: {
-                                fontWeight: 'bold',
-                                color: 'white',
-                                textShadow: '0px 1px 2px black'
-                            }
-                        }
+                            enabled: false
+                        },
+                        showInLegend: true
                     }
                 },
                 series: [{
                     type: 'pie',
-                    name: 'Browser share',
+                    name: 'Категории',
                     data: {{ graph.pie | safe }}
                 }]
             });

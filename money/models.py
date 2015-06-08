@@ -58,7 +58,7 @@ class Account(models.Model):
         if balance < 0:
             return 'danger'
         elif balance > 0:
-            return 'success'
+            return 'primary'
         else:
             return 'default'
 
@@ -421,14 +421,12 @@ class Goal(models.Model):
 
     def get_color(self):
         percent = self.get_percent()
-        if percent > 80:
+        if percent > 90:
             return 'danger'
         elif percent > 50:
             return 'warning'
-        elif percent > 25:
-            return 'success'
         else:
-            return 'info'
+            return 'success'
 
 
 class Param(models.Model):

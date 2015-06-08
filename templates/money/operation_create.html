@@ -1,34 +1,38 @@
-{% extends 'base.html' %}
+{% extends 'layout.html' %}
 
 {% load humanize %}
 
+{% block page_title %}{{ account.title }}{% endblock page_title %}
+{% block page_description %}новая транзакция{% endblock page_description %}
+
 {% block content %}
-    <br/>
 
-    <ol class="breadcrumb">
-        <li><a href="{% url 'money:index' %}">Счета</a></li>
-        <li><a href="{% url 'money:account' account.id %}">{{ account.title }}</a></li>
-    </ol>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                Форма транзакции
+            </h3>
+        </div>
+        <div class="panel-body">
+            <form action="{% url 'money:create_operation' account.id %}" method="post">
+                {% csrf_token %}
 
-    <div class="lead">Новая транзакция</div>
+                {% for field in form %}
+                    {% if not field.is_hidden %}
+                        <div class="form-group {% if field.errors %}has-error{% endif %}">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            <p class="help-block">{{ field.errors.as_text }}</p>
+                        </div>
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+                {% endfor %}
 
-    <form action="{% url 'money:create_operation' account.id %}" method="post">
-        {% csrf_token %}
-
-        {% for field in form %}
-            {% if not field.is_hidden %}
-                <div class="form-group {% if field.errors %}has-error{% endif %}">
-                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    {{ field }}
-                    <p class="help-block">{{ field.errors.as_text }}</p>
-                </div>
-            {% else %}
-                {{ field }}
-            {% endif %}
-        {% endfor %}
-
-        <button type="submit" class="btn btn-primary btn-block" data-loading-text="Выполняю...">Сохранить</button>
-    </form>
-
-    <br/>
+                <button type="submit" class="btn btn-primary btn-block" data-loading-text="Выполняю...">
+                    Создать транзакцию
+                </button>
+            </form>
+        </div>
+    </div>
 {% endblock %}

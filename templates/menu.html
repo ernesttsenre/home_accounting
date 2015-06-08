@@ -1,24 +1,32 @@
-<nav class="navbar navbar-inverse navbar-fixed-top">
+<!-- BEGIN HEADER MENU -->
+<div class="page-header-menu">
     <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
-                    aria-expanded="false" aria-controls="navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="{% url 'money:index' %}">Домашний учет</a>
+        <!-- BEGIN MEGA MENU -->
+        <!-- DOC: Apply "hor-menu-light" class after the "hor-menu" class below to have a horizontal menu with white background -->
+        <!-- DOC: Remove data-hover="dropdown" and data-close-others="true" attributes below to disable the dropdown opening on mouse hover -->
+        <div class="hor-menu ">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="{% url 'money:create_transfer' %}">
+                        <i class="fa fa-mail-forward"></i>
+                        Создать перевод
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'money:operation_month_archive' current_year current_month %}">
+                        <i class="fa fa-bar-chart-o"></i>
+                        Месячный отчет
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'accounts:logout' %}">
+                        <i class="fa fa-user"></i>
+                        Выйти
+                    </a>
+                </li>
+            </ul>
         </div>
-        <div id="navbar" class="collapse navbar-collapse">
-            {% if user.is_authenticated %}
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a href="{% url 'money:create_transfer' %}">Создать перевод</a></li>
-                    <li><a href="{% url 'money:operation_month_archive' current_year current_month %}">Отчет</a></li>
-                    <li><a href="{% url 'accounts:logout' %}">Выйти</a></li>
-                </ul>
-            {% endif %}
-        </div>
-        <!--/.nav-collapse -->
+        <!-- END MEGA MENU -->
     </div>
-</nav>
+</div>
+<!-- END HEADER MENU -->

@@ -1,81 +1,90 @@
-{% extends 'base.html' %}
+{% extends 'layout.html' %}
 
 {% load humanize %}
 
+{% block page_title %}Месячный отчет{% endblock page_title %}
+{% block page_description %}{% endblock page_description %}
+
 {% block content %}
-    <br/>
 
-    <ol class="breadcrumb">
-        <li><a href="{% url 'money:index' %}">Счета</a></li>
-    </ol>
-
-    <div class="lead clearfix">
-        <div class="pull-left">
-            {{ month|date:"F Y" }}
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                {{ month|date:"F Y" }}
+                <span class="pull-right">{{ amount | intcomma }}</span>
+            </h3>
         </div>
-        <div class="pull-right text-info">
-            {{ amount | intcomma }}
-        </div>
-    </div>
-
-    <nav>
-        <ul class="pager">
-            {% if previous_month %}
-                <li>
-                    <a href="{% url 'money:operation_month_archive' previous_month.year previous_month.month %}">
-                        <i class="glyphicon glyphicon-chevron-left"></i>
-                        {{ previous_month|date:"F Y" }}
-                    </a>
-                </li>
-            {% endif %}
-
-            {% if next_month %}
-                <li>
-                    <a href="{% url 'money:operation_month_archive' next_month.year next_month.month %}">
-                        {{ next_month|date:"F Y" }}
-                        <i class="glyphicon glyphicon-chevron-right"></i>
-                    </a>
-                </li>
-            {% endif %}
-        </ul>
-    </nav>
-
-    <div class="lead">Недельные траты</div>
-    <div id="container_week" style="height: 300px; margin: 0 auto"></div>
-
-    <div class="lead">Категории трат</div>
-    <div id="container_month" style="height: 300px; margin: 0 auto"></div>
-
-    {% if object_list %}
-        <hr/>
-        <div class="lead">Список операций</div>
-        <div class="list-group operations-list">
-            {% for operation in object_list %}
-                <a href="{% url 'money:operation' operation.id %}" class="list-group-item"
-                   data-week="{{ operation.get_created_week }}">
-                    <div class="row">
-                        <div class="col-xs-8">
+        <div class="panel-body">
+            {% if object_list %}
+                <div class="list-group operations-list">
+                    {% for operation in object_list %}
+                        <a href="{% url 'money:operation' operation.id %}" class="list-group-item"
+                           data-week="{{ operation.get_created_week }}">
+                            <div class="row">
+                                <div class="col-xs-8">
                             <span class="text-{{ operation.get_color }}">
                                 {{ operation.get_category_title }}
                             </span>
 
-                            <br/>
+                                    <br/>
 
-                            <small>
-                                {{ operation.user.first_name }},
-                                {{ operation.created_at | naturalday }}
-                            </small>
-                        </div>
-                        <div class="col-xs-4 text-right">
-                            <span class="label label-{{ operation.get_color }}">{{ operation.get_amount | intcomma }}</span>
-                        </div>
-                    </div>
-                </a>
-            {% endfor %}
+                                    <small>
+                                        {{ operation.user.first_name }},
+                                        {{ operation.created_at | naturalday }}
+                                    </small>
+                                </div>
+                                <div class="col-xs-4 text-right">
+                                    <span class="label label-{{ operation.get_color }}">{{ operation.get_amount | intcomma }}</span>
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                В этом месяце ещё нет операций
+            {% endif %}
         </div>
-    {% else %}
-        В этом месяце ещё нет операций
-    {% endif %}
+    </div>
+
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                Траты по неделям
+            </h3>
+        </div>
+        <div class="panel-body">
+            <div id="container_week" style="height: 300px; margin: 0 auto"></div>
+        </div>
+    </div>
+
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                Категории трат
+            </h3>
+        </div>
+        <div class="panel-body">
+            <div id="container_month" style="height: 300px; margin: 0 auto"></div>
+        </div>
+    </div>
+
+    <ul class="pager">
+        {% if previous_month %}
+            <li class="previous {% if not previous_month %}disabled{% endif %}">
+                <a href="{% url 'money:operation_month_archive' previous_month.year previous_month.month %}">
+                    ← {{ previous_month|date:"F Y" }}
+                </a>
+            </li>
+        {% endif %}
+
+        {% if next_month %}
+            <li class="next">
+                <a href="{% url 'money:operation_month_archive' next_month.year next_month.month %}">
+                    {{ next_month|date:"F Y" }} →
+                </a>
+            </li>
+        {% endif %}
+    </ul>
 {% endblock %}
 
 {% block js %}

@@ -1,52 +1,58 @@
-{% extends 'base.html' %}
+{% extends 'layout.html' %}
 
 {% load humanize %}
 
+{% block page_title %}{{ account.title }}{% endblock page_title %}
+{% block page_description %}подробно{% endblock page_description %}
+
 {% block content %}
-    <br/>
 
-    <ol class="breadcrumb">
-        <li><a href="{% url 'money:index' %}">Счета</a></li>
-    </ol>
-
-    <div class="lead clearfix">
-        <div class="pull-left">
-            {{ account.title }}
-        </div>
-        <div class="pull-right text-info">
-            {{ account.balance | intcomma }}
+    <div class="row">
+        <div class="col-xs-12">
+            <a href="{% url 'money:create_operation' account.id %}" class="btn btn-primary btn-block">Создать новую
+                транзакцию</a>
         </div>
     </div>
 
-    <a href="{% url 'money:create_operation' account.id %}" class="btn btn-primary btn-block">Создать новую транзакцию</a>
+    <hr/>
 
-    <br/>
-
-    {% if operations %}
-        <div class="list-group">
-            {% for operation in operations %}
-                <a href="{% url 'money:operation' operation.id %}" class="list-group-item">
-                    <div class="row">
-                        <div class="col-xs-8">
-                            <span class="text-{{ operation.get_color }}">
-                                {{ operation.get_category_title }}
-                            </span>
-
-                            <br/>
-
-                            <small>
-                                {{ operation.user.first_name }},
-                                {{ operation.created_at | naturalday }}
-                            </small>
-                        </div>
-                        <div class="col-xs-4 text-right">
-                            <span class="label label-{{ operation.get_color }}">{{ operation.get_amount | intcomma }}</span>
-                        </div>
-                    </div>
-                </a>
-            {% endfor %}
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                Баланс
+                <span class="pull-right">{{ account.balance | intcomma }}</span>
+            </h3>
         </div>
-    {% else %}
-        <p>Нет транзакций по текущему счету</p>
-    {% endif %}
+        <div class="panel-body">
+            {% if operations %}
+                <div class="list-group">
+                    {% for operation in operations %}
+                        <a href="{% url 'money:operation' operation.id %}" class="list-group-item">
+                            <div class="row">
+                                <div class="col-xs-8">
+                                    <span class="text-{{ operation.get_color }}">
+                                        {{ operation.get_category_title }}
+                                    </span>
+
+                                    <br/>
+
+                                    <small>
+                                        {{ operation.user.first_name }},
+                                        {{ operation.created_at | naturalday }}
+                                    </small>
+                                </div>
+                                <div class="col-xs-4 text-right">
+                                    <span class="label label-{{ operation.get_color }}">
+                                        {{ operation.get_amount | intcomma }}
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>Нет транзакций по текущему счету</p>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}

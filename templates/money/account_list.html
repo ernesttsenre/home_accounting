@@ -1,75 +1,81 @@
-{% extends 'base.html' %}
+{% extends 'layout.html' %}
 
 {% load humanize %}
 
+{% block page_title %}Счета и цели{% endblock page_title %}
+{% block page_description %}{% endblock page_description %}
+
 {% block content %}
-    <br/>
-
-    <div class="lead clearfix">
-        <div class="pull-left">
-            Доступные счета
-        </div>
-        <div class="pull-right text-info">
-            {{ total | intcomma }}
-        </div>
-    </div>
-
     {% if object_list %}
-        <div class="list-group">
-            {% for account in object_list %}
-                {% if not account.is_accumulation %}
-                    <a href="{% url 'money:account' account.id %}" class="list-group-item">
-                        <div class="row">
-                            <div class="col-xs-8">
-                                <span class="text-{{ account.get_color }}">
-                                    {{ account.title }}
-                                </span>
-                            </div>
-                            <div class="col-xs-4 text-right">
-                                <span class="label label-{{ account.get_color }}">{{ account.balance | intcomma }}</span>
-                            </div>
-                        </div>
-                    </a>
-                {% endif %}
-            {% endfor %}
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    Доступные счета
+                    <span class="pull-right">{{ total | intcomma }}</span>
+                </h3>
+            </div>
+            <div class="panel-body">
+                <div class="list-group">
+                    {% for account in object_list %}
+                        {% if not account.is_accumulation %}
+                            <a href="{% url 'money:account' account.id %}" class="list-group-item">
+                                <div class="row">
+                                    <div class="col-xs-8">
+                                        <span class="text-{{ account.get_color }}">
+                                            {{ account.title }}
+                                        </span>
+                                    </div>
+                                    <div class="col-xs-4 text-right">
+                                        <span class="label label-{{ account.get_color }}">
+                                            {{ account.balance | intcomma }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     {% else %}
         <p>В системе нет счетов</p>
     {% endif %}
 
     {% if goals %}
-        <div class="lead clearfix">
-            <div class="pull-left">
-                Доступные цели
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    Доступные цели
+                    <span class="pull-right"></span>
+                </h3>
             </div>
-            <div class="pull-right text-info">
+            <div class="panel-body">
+                <ul class="list-group">
+                    {% for goal in goals %}
+                        <li class="list-group-item">
+                            <div class="row">
+                                <div class="col-xs-6 text-{{ goal.get_color }}">
+                                    {{ goal.title }}
+                                </div>
+                                <div class="col-xs-6 text-right">
+                                    <span class="label label-{{ goal.get_color }}">
+                                        {{ goal.amount | intcomma }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="progress" style="margin-bottom: 0; margin-top: 10px;">
+                                <div class="progress-bar progress-bar-{{ goal.get_color }}" role="progressbar"
+                                     aria-valuenow="{{ goal.percent }}"
+                                     aria-valuemin="0" aria-valuemax="100"
+                                     style="min-width: 4em; width: {{ goal.get_percent }}%;">
+                                    <span class="sr-only">{{ goal.percent }}%</span>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
-
-        <ul class="list-group">
-            {% for goal in goals %}
-                <li class="list-group-item">
-                    <div class="row">
-                        <div class="col-xs-6">
-                            {{ goal.title }}
-                        </div>
-                        <div class="col-xs-6 text-right">
-                            <span class="label label-warning">
-                                {{ goal.amount | intcomma }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="progress" style="margin-bottom: 0; margin-top: 10px;">
-                        <div class="progress-bar progress-bar-{{ goal.get_color }}" role="progressbar"
-                             aria-valuenow="{{ goal.percent }}"
-                             aria-valuemin="0" aria-valuemax="100"
-                             style="min-width: 4em; width: {{ goal.get_percent }}%;">
-                            {{ goal.percent }}%
-                        </div>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
     {% endif %}
 {% endblock %}

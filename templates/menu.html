@@ -8,19 +8,16 @@
             <ul class="nav navbar-nav">
                 <li>
                     <a href="{% url 'money:create_transfer' %}">
-                        <i class="fa fa-mail-forward"></i>
                         Создать перевод
                     </a>
                 </li>
                 <li>
                     <a href="{% url 'money:operation_month_archive' current_year current_month %}">
-                        <i class="fa fa-bar-chart-o"></i>
                         Месячный отчет
                     </a>
                 </li>
                 <li>
                     <a href="{% url 'accounts:logout' %}">
-                        <i class="fa fa-user"></i>
                         Выйти
                     </a>
                 </li>

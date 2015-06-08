@@ -79,7 +79,7 @@ class OperationMonthArchiveView(MonthArchiveView):
     def get_context_data(self, **kwargs):
         context = super(OperationMonthArchiveView, self).get_context_data(**kwargs)
 
-        # раздобудем данные для графика
+        # раздобудем данные для графика по тратам за неделю
         year = self.get_year()
         month = self.get_month()
         data = Operation.objects.get_credit_week_report(year, month)
@@ -87,6 +87,12 @@ class OperationMonthArchiveView(MonthArchiveView):
         jsonData = {}
         jsonData['categories'] = json.dumps(data['categories'])
         jsonData['data'] = json.dumps(data['data'])
+
+        # данные для графика трат по категориям
+        pie = Operation.objects.get_credit_categories_month_report(year, month)
+        jsonData['pie'] = json.dumps(pie['data'])
+
+        # JSON для графиков
         context['graph'] = jsonData
 
         template_globals = global_vars(self.request)

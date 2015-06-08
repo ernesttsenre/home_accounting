@@ -46,6 +46,30 @@ class OperationQuerySet(models.QuerySet):
         finally:
             cursor.close()
 
+    def get_credit_categories_by_month(self, year, month):
+        cursor = connection.cursor()
+        try:
+            cursor.execute('''
+                SELECT
+                  money_category.title,
+                  sum(money_operation.amount)
+                FROM money_operation
+                  INNER JOIN money_category ON money_category.id = money_operation.category_id AND money_category.affected_limit = TRUE
+                WHERE money_operation.type = -1 AND money_operation.transfer_id IS NULL AND
+                    extract(YEAR FROM money_operation.created_at) = 2015 AND
+                    extract(MONTH FROM money_operation.created_at) = 6
+                GROUP BY money_category.title
+            ''', [month, year])
+
+            items = cursor.fetchall()
+            data = [[row[0], float(row[1])] for row in items]
+
+            return {
+                'data': data
+            }
+        finally:
+            cursor.close()
+
 
 class OperationManager(models.Manager):
     def get_queryset(self):
@@ -59,3 +83,6 @@ class OperationManager(models.Manager):
 
     def get_credit_week_report(self, year, month):
         return self.get_queryset().get_credit_by_week(year, month)
+
+    def get_credit_categories_month_report(self, year, month):
+        return self.get_queryset().get_credit_categories_by_month(year, month)

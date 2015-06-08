@@ -41,7 +41,10 @@
     </nav>
 
     <div class="lead">Недельные траты</div>
-    <div id="container" style="height: 300px; margin: 0 auto"></div>
+    <div id="container_week" style="height: 300px; margin: 0 auto"></div>
+
+    <div class="lead">Категории трат</div>
+    <div id="container_month" style="height: 300px; margin: 0 auto"></div>
 
     {% if object_list %}
         <hr/>
@@ -81,7 +84,7 @@
 
     <script>
         $(function () {
-            $('#container').highcharts({
+            $('#container_week').highcharts({
                 chart: {
                     type: 'column'
                 },
@@ -164,6 +167,46 @@
                             color: '#34A82C'
                         }
                     }
+                }]
+            });
+
+            $('#container_month').highcharts({
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false
+                },
+                title: {
+                    text: ''
+                },
+                exporting: {
+                    enabled: false
+                },
+                tooltip: {
+                    enabled: false
+                },
+                legend: {
+                    enabled: false
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            distance: -40,
+                            style: {
+                                fontWeight: 'bold',
+                                color: 'white',
+                                textShadow: '0px 1px 2px black'
+                            }
+                        },
+                    }
+                },
+                series: [{
+                    type: 'pie',
+                    name: 'Browser share',
+                    data: {{ graph.pie | safe }}
                 }]
             });
         });

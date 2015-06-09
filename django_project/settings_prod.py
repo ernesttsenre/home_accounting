@@ -50,6 +50,7 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'money',
     'accounts',
+    'django_gravatar',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -140,3 +141,5 @@ SUIT_CONFIG = {
     },
     'LIST_PER_PAGE': 50
 }
+
+GRAVATAR_DEFAULT_SIZE = 20

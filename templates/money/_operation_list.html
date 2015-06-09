@@ -1,10 +1,13 @@
 {% load humanize %}
+{% load gravatar %}
 
 <div class="list-group {% if container_class %}{{ container_class }}{% endif %}">
     {% for operation in operations %}
         <a href="{% url 'money:operation' operation.id %}" class="list-group-item">
             <div class="row">
                 <div class="col-xs-8">
+                    <img src="{% gravatar_url user.email %}" class="img-circle" alt="Gravatar"/>
+
                     <span>
                         {{ operation.get_category_title }}
                     </span>
@@ -16,15 +19,9 @@
                 </div>
             </div>
 
-            <small class="text-muted">
+            <small class="text-muted mt10">
                 {% if operation.comment %}
                     <i class="fa fa-comment-o"></i>
-                {% endif %}
-
-                {% if operation.user.first_name %}
-                    {{ operation.user.first_name }}.
-                {% else %}
-                    Никто.
                 {% endif %}
 
                 {{ operation.created_at | naturalday }}

@@ -22,9 +22,9 @@ def get_week_credit_amount():
         credit_percent = float(credit_amount) / float(credit_limit) * 100
 
     credit_color = 'success'
-    if credit_percent >= 90:
+    if credit_percent > 100:
         credit_color = 'danger'
-    elif credit_percent >= 80:
+    elif credit_percent > 90:
         credit_color = 'warning'
 
     return {

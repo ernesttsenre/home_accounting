@@ -85,6 +85,10 @@ License: You must have a valid license purchased only from themeforest(the above
     <!-- END HEADER TOP -->
 
     {% if request.user.is_authenticated %}
+        {% include 'report.html' %}
+    {% endif %}
+
+    {% if request.user.is_authenticated %}
         {% include 'menu.html' %}
     {% endif %}
 </div>

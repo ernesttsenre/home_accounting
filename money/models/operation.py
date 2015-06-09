@@ -115,6 +115,11 @@ class Operation(models.Model):
             return True
         return False
 
+    def get_type_title(self):
+        if self.type == self.CREDIT_OPERATION:
+            return 'Расход'
+        return 'Пополнение'
+
     def clean(self):
         super(Operation, self).clean()
         errors = {}

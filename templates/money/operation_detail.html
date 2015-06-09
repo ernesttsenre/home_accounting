@@ -2,8 +2,8 @@
 
 {% load humanize %}
 
-{% block page_title %}{{ operation.category.title }}{% endblock page_title %}
-{% block page_description %}подробно{% endblock page_description %}
+{% block page_title %}{{ operation.get_category_title }}{% endblock page_title %}
+{% block page_description %}{% endblock page_description %}
 
 {% block content %}
 
@@ -25,7 +25,9 @@
             </li>
             <li class="list-group-item">
                 Что:
-                <strong class="pull-right">{{ operation.get_category_title }}</strong>
+                <strong class="pull-right">
+                    {{ operation.get_type_title }}
+                </strong>
             </li>
             <li class="list-group-item">
                 Когда:

@@ -3,7 +3,7 @@
 
 <div class="list-group {% if container_class %}{{ container_class }}{% endif %}">
     {% for operation in operations %}
-        <a href="{% url 'money:operation' operation.id %}" class="list-group-item">
+        <a href="{% url 'money:operation' operation.id %}" class="list-group-item" data-week="{{ operation.get_created_week }}">
             <div class="row">
                 <div class="col-xs-8" style="height: 20px; overflow: hidden;">
                     <img src="{% gravatar_url operation.user.email %}" class="img-circle" alt="Gravatar" style="width: 20px; height: 20px;"/>

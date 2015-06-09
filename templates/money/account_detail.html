@@ -20,7 +20,7 @@
         <div class="panel-heading">
             <h3 class="panel-title">
                 Баланс
-                <span class="pull-right">{{ account.balance | intcomma }}</span>
+                <span class="pull-right">{{ account.balance | floatformat:0 | intcomma }}</span>
             </h3>
         </div>
         {% if operations %}

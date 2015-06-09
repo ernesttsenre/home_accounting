@@ -124,7 +124,7 @@ License: You must have a valid license purchased only from themeforest(the above
                             <ul>
                                 {% for item in plan_overdue %}
                                     <li>
-                                        {{ item.title }}: {{ item.amount | intcomma }}
+                                        {{ item.title }}: {{ item.amount | floatformat:0 | intcomma }}
                                     </li>
                                 {% endfor %}
                             </ul>

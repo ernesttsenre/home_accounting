@@ -11,7 +11,7 @@
             <div class="panel-heading">
                 <h3 class="panel-title">
                     Доступные счета
-                    <span class="pull-right">{{ total | intcomma }}</span>
+                    <span class="pull-right">{{ total | floatformat:0 | intcomma }}</span>
                 </h3>
             </div>
             <div class="list-group">
@@ -26,7 +26,7 @@
                                 </div>
                                 <div class="col-xs-4 text-right">
                                         <span class="label label-{{ account.get_color }}">
-                                            {{ account.balance | intcomma }}
+                                            {{ account.balance | floatformat:0 | intcomma }}
                                         </span>
                                 </div>
                             </div>
@@ -58,7 +58,7 @@
                             </div>
                             <div class="col-xs-6 text-right">
                                 <span class="label label-{{ goal.get_color }}">
-                                    {{ goal.amount | intcomma }}
+                                    {{ goal.amount | floatformat:0 | intcomma }}
                                 </span>
                             </div>
                         </div>

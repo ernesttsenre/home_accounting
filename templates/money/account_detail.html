@@ -24,31 +24,7 @@
             </h3>
         </div>
         {% if operations %}
-            <div class="list-group">
-                {% for operation in operations %}
-                    <a href="{% url 'money:operation' operation.id %}" class="list-group-item">
-                        <div class="row">
-                            <div class="col-xs-8">
-                                    <span>
-                                        {{ operation.get_category_title }}
-                                    </span>
-
-                                <br/>
-
-                                <small class="text-muted">
-                                    {{ operation.user.first_name }},
-                                    {{ operation.created_at | naturalday }}
-                                </small>
-                            </div>
-                            <div class="col-xs-4 text-right">
-                                    <span class="label label-{{ operation.get_color }}">
-                                        {{ operation.get_amount | intcomma }}
-                                    </span>
-                            </div>
-                        </div>
-                    </a>
-                {% endfor %}
-            </div>
+            {% include 'money/_operation_list.html' with operations=operations %}
         {% else %}
             <div class="panel-body">
                 Нет транзакций по текущему счету

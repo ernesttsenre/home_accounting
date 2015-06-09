@@ -37,30 +37,7 @@
             </h3>
         </div>
         {% if object_list %}
-            <div class="list-group operations-list">
-                {% for operation in object_list %}
-                    <a href="{% url 'money:operation' operation.id %}" class="list-group-item"
-                       data-week="{{ operation.get_created_week }}">
-                        <div class="row">
-                            <div class="col-xs-8">
-                                    <span>
-                                        {{ operation.get_category_title }}
-                                    </span>
-
-                                <br/>
-
-                                <small class="text-muted">
-                                    {{ operation.user.first_name }},
-                                    {{ operation.created_at | naturalday }}
-                                </small>
-                            </div>
-                            <div class="col-xs-4 text-right">
-                                <span class="label label-{{ operation.get_color }}">{{ operation.get_amount | intcomma }}</span>
-                            </div>
-                        </div>
-                    </a>
-                {% endfor %}
-            </div>
+            {% include 'money/_operation_list.html' with operations=object_list container_class='operations-list' %}
         {% else %}
             <div class="panel-body">
                 В этом месяце ещё нет операций

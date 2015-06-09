@@ -6,7 +6,7 @@
         <a href="{% url 'money:operation' operation.id %}" class="list-group-item">
             <div class="row">
                 <div class="col-xs-8">
-                    <img src="{% gravatar_url user.email %}" class="img-circle" alt="Gravatar"/>
+                    <img src="{% gravatar_url user.email %}" class="img-circle" alt="Gravatar" style="width: 20px; height: 20px;"/>
 
                     <span>
                         {{ operation.get_category_title }}

@@ -93,6 +93,7 @@ License: You must have a valid license purchased only from themeforest(the above
     {% endif %}
 </div>
 <!-- END HEADER -->
+
 <!-- BEGIN PAGE CONTAINER -->
 <div class="page-container">
     <!-- BEGIN PAGE HEAD -->
@@ -122,7 +123,9 @@ License: You must have a valid license purchased only from themeforest(the above
                             Просрочены плановые траты:
                             <ul>
                                 {% for item in plan_overdue %}
-                                    <li>{{ item.title }}: {{ item.amount | intcomma }}</li>
+                                    <li>
+                                        {{ item.title }}: {{ item.amount | intcomma }}
+                                    </li>
                                 {% endfor %}
                             </ul>
                         </div>

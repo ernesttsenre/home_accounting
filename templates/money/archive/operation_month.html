@@ -36,36 +36,36 @@
                 Транзакции
             </h3>
         </div>
-        <div class="panel-body">
-            {% if object_list %}
-                <div class="list-group operations-list">
-                    {% for operation in object_list %}
-                        <a href="{% url 'money:operation' operation.id %}" class="list-group-item"
-                           data-week="{{ operation.get_created_week }}">
-                            <div class="row">
-                                <div class="col-xs-8">
+        {% if object_list %}
+            <div class="list-group operations-list">
+                {% for operation in object_list %}
+                    <a href="{% url 'money:operation' operation.id %}" class="list-group-item"
+                       data-week="{{ operation.get_created_week }}">
+                        <div class="row">
+                            <div class="col-xs-8">
                                     <span>
                                         {{ operation.get_category_title }}
                                     </span>
 
-                                    <br/>
+                                <br/>
 
-                                    <small class="text-muted">
-                                        {{ operation.user.first_name }},
-                                        {{ operation.created_at | naturalday }}
-                                    </small>
-                                </div>
-                                <div class="col-xs-4 text-right">
-                                    <span class="label label-{{ operation.get_color }}">{{ operation.get_amount | intcomma }}</span>
-                                </div>
+                                <small class="text-muted">
+                                    {{ operation.user.first_name }},
+                                    {{ operation.created_at | naturalday }}
+                                </small>
                             </div>
-                        </a>
-                    {% endfor %}
-                </div>
-            {% else %}
+                            <div class="col-xs-4 text-right">
+                                <span class="label label-{{ operation.get_color }}">{{ operation.get_amount | intcomma }}</span>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="panel-body">
                 В этом месяце ещё нет операций
-            {% endif %}
-        </div>
+            </div>
+        {% endif %}
     </div>
 
     <ul class="pager">

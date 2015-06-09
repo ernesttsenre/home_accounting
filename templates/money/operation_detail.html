@@ -14,26 +14,24 @@
                 <span class="pull-right">{{ operation.get_amount | intcomma }}</span>
             </h3>
         </div>
-        <div class="panel-body">
-            <ul class="list-group">
-                <li class="list-group-item">
-                    Кто:
-                    <strong class="pull-right">{{ operation.user.first_name }}</strong>
-                </li>
-                <li class="list-group-item">
-                    Где:
-                    <strong class="pull-right">{{ operation.account.title }}</strong>
-                </li>
-                <li class="list-group-item">
-                    Что:
-                    <strong class="pull-right">{{ operation.get_category_title }}</strong>
-                </li>
-                <li class="list-group-item">
-                    Когда:
-                    <strong class="text-capitalize pull-right">{{ operation.created_at | naturalday }}</strong>
-                </li>
-            </ul>
-        </div>
+        <ul class="list-group">
+            <li class="list-group-item">
+                Кто:
+                <strong class="pull-right">{{ operation.user.first_name }}</strong>
+            </li>
+            <li class="list-group-item">
+                Где:
+                <strong class="pull-right">{{ operation.account.title }}</strong>
+            </li>
+            <li class="list-group-item">
+                Что:
+                <strong class="pull-right">{{ operation.get_category_title }}</strong>
+            </li>
+            <li class="list-group-item">
+                Когда:
+                <strong class="text-capitalize pull-right">{{ operation.created_at | naturalday }}</strong>
+            </li>
+        </ul>
     </div>
 
     {% if operation.comment %}

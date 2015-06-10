@@ -60,3 +60,14 @@ class Goal(models.Model):
             return 'warning'
         else:
             return 'success'
+
+    @staticmethod
+    def get_total_amount():
+        total = 0
+
+        goals = Goal.objects.all()
+
+        for goal in goals:
+            total += goal.amount
+
+        return total

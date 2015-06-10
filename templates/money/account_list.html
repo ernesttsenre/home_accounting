@@ -10,7 +10,7 @@
         <div class="panel panel-primary">
             <div class="panel-heading">
                 <h3 class="panel-title">
-                    Доступные счета
+                    Счета
                     <span class="pull-right">{{ total | floatformat:0 | intcomma }}</span>
                 </h3>
             </div>
@@ -45,8 +45,8 @@
         <div class="panel panel-success">
             <div class="panel-heading">
                 <h3 class="panel-title">
-                    Доступные цели
-                    <span class="pull-right"></span>
+                    Цели
+                    <span class="pull-right">{{ goals_total | floatformat:0 | intword | intcomma }}</span>
                 </h3>
             </div>
             <ul class="list-group">

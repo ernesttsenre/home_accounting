@@ -3,3 +3,4 @@ django-suit
 psycopg2
 django-admin-easy
 django-gravatar2
+djrill

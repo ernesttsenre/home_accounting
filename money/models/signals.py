@@ -1,11 +1,24 @@
 from django.db.models.signals import post_save, post_delete
+from django.contrib.auth.models import User
 
 from money.models import Operation, Transfer, Goal
+from money.utils.email import Email
 
 
 def create_operation(sender, instance, **kwargs):
+    """
+    :param sender:
+    :type instance: Operation
+    :param kwargs:
+    :return:
+    """
     instance.account.balance = instance.account.get_balance()
     instance.account.save()
+
+    if instance.is_debit():
+        users = User.objects.filter(id__exact=instance.user_id)
+        for user in users:
+            Email.send_debit_email(user, instance)
 
     goals = Goal.objects.filter(account_id=instance.account.id)
     for goal in goals:

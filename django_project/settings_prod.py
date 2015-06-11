@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'money',
     'accounts',
     'django_gravatar',
+    'djrill',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -143,3 +144,8 @@ SUIT_CONFIG = {
 }
 
 GRAVATAR_DEFAULT_SIZE = 40
+
+# Mandrill
+MANDRILL_API_KEY = "aAXTxZ2MhGNJ-m2Smp6CNA"
+EMAIL_BACKEND = "djrill.mail.backends.djrill.DjrillBackend"
+DEFAULT_FROM_EMAIL = 'ernest.oleg.iv@gmail.com'

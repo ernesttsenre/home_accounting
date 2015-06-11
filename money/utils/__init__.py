@@ -1,0 +1,1 @@
+from money.utils.email import Email

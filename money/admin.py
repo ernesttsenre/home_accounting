@@ -1,10 +1,15 @@
-from django.contrib import admin
-from money.models import Account, Category, Operation, Goal, Transfer, Param, PlanItem
 import easy
 import copy
 
+from django.contrib import admin
+from money.models import Account, Category, Operation, Goal, Transfer, Param, PlanItem
+from djrill import DjrillAdminSite
+
 admin.site.site_header = 'Управление счетами'
 
+# Mandrill
+# admin.site = DjrillAdminSite()
+admin.autodiscover()
 
 class AccountInline(admin.TabularInline):
     model = Account

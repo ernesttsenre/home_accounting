@@ -115,6 +115,12 @@ class Operation(models.Model):
             return True
         return False
 
+    def is_debit(self):
+        return self.type == self.DEBIT_OPERATION
+
+    def is_credit(self):
+        return self.type == self.CREDIT_OPERATION
+
     def get_type_title(self):
         if self.type == self.CREDIT_OPERATION:
             return 'Расход'

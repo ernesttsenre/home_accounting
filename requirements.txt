@@ -4,3 +4,6 @@ psycopg2
 django-admin-easy
 django-gravatar2
 djrill
+djangorestframework
+markdown
+django-filter

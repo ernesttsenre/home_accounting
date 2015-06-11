@@ -52,6 +52,7 @@ INSTALLED_APPS = (
     'accounts',
     'django_gravatar',
     'djrill',
+    'rest_framework',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -149,3 +150,9 @@ GRAVATAR_DEFAULT_SIZE = 40
 MANDRILL_API_KEY = "aAXTxZ2MhGNJ-m2Smp6CNA"
 EMAIL_BACKEND = "djrill.mail.backends.djrill.DjrillBackend"
 DEFAULT_FROM_EMAIL = 'ernest.oleg.iv@gmail.com'
+
+# Django REST
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAdminUser',),
+    'PAGE_SIZE': 10
+}

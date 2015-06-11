@@ -1,39 +1,11 @@
 import json
-from money.context_processors import global_vars
 
-from django.views.generic import MonthArchiveView, ListView, DetailView, CreateView
+from django.views.generic import MonthArchiveView, DetailView, CreateView
 from django.shortcuts import get_object_or_404
-from money.models import Operation, Account, Goal, Transfer
-from money.forms import OperationForm, TransferForm
-from datetime import datetime, timedelta
 
-
-class AccountList(ListView):
-    model = Account
-
-    def get_context_data(self, **kwargs):
-        context = super(AccountList, self).get_context_data(**kwargs)
-
-        goals = Goal.objects.all()
-        context['goals'] = goals
-        context['goals_total'] = Goal.get_total_amount()
-
-        total_balance = Account.get_total_amount()
-        context['total'] = total_balance
-        return context
-
-
-class AccountDetail(DetailView):
-    model = Account
-
-    def get_context_data(self, **kwargs):
-        context = super(AccountDetail, self).get_context_data(**kwargs)
-
-        last_month = datetime.today() - timedelta(days=30)
-        operations = self.object.operations.filter(created_at__gte=last_month).order_by('-created_at')
-
-        context['operations'] = operations
-        return context
+from money.models import Operation, Account
+from money.forms import OperationForm
+from money.context_processors import global_vars
 
 
 class OperationDetail(DetailView):
@@ -59,16 +31,6 @@ class OperationCreate(CreateView):
         context = super(OperationCreate, self).get_context_data(**kwargs)
         context['account'] = self.account
         return context
-
-
-class TransferCreate(CreateView):
-    form_class = TransferForm
-    template_name = 'money/transfer_create.html'
-    success_url = '/'
-
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        return super(TransferCreate, self).form_valid(form)
 
 
 class OperationMonthArchiveView(MonthArchiveView):

@@ -16,8 +16,22 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
+from rest_framework import routers
+from money.views import *
+
+router = routers.DefaultRouter()
+router.register(r'users', UserViewSet)
+router.register(r'accounts', AccountViewSet)
+router.register(r'categories', CategoryViewSet)
+router.register(r'operations', OperationViewSet)
+router.register(r'transfers', TransferViewSet)
+router.register(r'goals', GoalViewSet)
+
 urlpatterns = [
     url(r'^', include('money.urls', namespace='money')),
     url(r'^accounts/', include('accounts.urls', namespace='accounts')),
     url(r'^admin/', include(admin.site.urls)),
+
+    # Django REST
+    url(r'^api/', include(router.urls)),
 ]

@@ -22,7 +22,7 @@ class Email(object):
             'USERNAME': user.first_name,
             'OPERATION_USER': operation.user.first_name,
             'OPERATION_ACCOUNT': operation.account.title,
-            'OPERATION_AMOUNT': intcomma(float(operation.amount)),
+            'OPERATION_AMOUNT': intcomma(round(operation.amount, 0)),
             'COPYRIGHT': '2015 &copy; Иванов Олег',
         }
         msg.send()

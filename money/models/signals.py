@@ -1,6 +1,8 @@
 from django.db.models.signals import post_save, post_delete
 from django.contrib.auth.models import User
 
+from threading import Thread
+
 from money.models import Operation, Transfer, Goal
 from money.utils.email import Email
 
@@ -18,7 +20,8 @@ def create_operation(sender, instance, **kwargs):
     if instance.is_debit():
         users = User.objects.filter(id__exact=instance.user_id)
         for user in users:
-            Email.send_debit_email(user, instance)
+            thread = Thread(target=Email.send_debit_email, args=(user, instance,))
+            thread.start()
 
     goals = Goal.objects.filter(account_id=instance.account.id)
     for goal in goals:

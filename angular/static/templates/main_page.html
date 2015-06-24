@@ -1,0 +1,25 @@
+<div ng-controller="MainPageController">
+    <h3>Счета</h3>
+    <ul class="unstyled">
+        <li ng-repeat="account in accounts">
+            <span>
+                <a ng-href="//account.url//">
+                    //account.title//:
+                    //account.balance// руб
+                </a>
+            </span>
+        </li>
+    </ul>
+
+    <hr/>
+
+    <h3>Цели</h3>
+    <ul class="unstyled">
+        <li ng-repeat="goal in goals">
+            <span>
+                //goal.title//:
+                //goal.amount// руб
+            </span>
+        </li>
+    </ul>
+</div>

@@ -18,7 +18,7 @@ def create_operation(sender, instance, **kwargs):
     instance.account.save()
 
     if instance.is_debit():
-        users = User.objects.filter(id__exact=instance.user_id)
+        users = User.objects.all()
         for user in users:
             thread = Thread(target=Email.send_debit_email, args=(user, instance,))
             thread.start()

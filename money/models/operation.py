@@ -34,7 +34,7 @@ class Operation(models.Model):
     transfer = models.ForeignKey(
         Transfer,
         verbose_name='Перевод',
-        related_name='transfers',
+        related_name='operations',
         on_delete=models.CASCADE,
         null=True,
         blank=True,
@@ -45,12 +45,14 @@ class Operation(models.Model):
         Category,
         verbose_name='Основание',
         null=True,
-        blank=True
+        blank=True,
+        related_name='operations'
     )
 
     user = models.ForeignKey(
         User,
-        verbose_name='Пользователь'
+        verbose_name='Пользователь',
+        related_name='operations',
     )
 
     amount = models.DecimalField(

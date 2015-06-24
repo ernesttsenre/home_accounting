@@ -1,6 +1,10 @@
-from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
 from money.serializers import *
+
+
+class GroupViewSet(viewsets.ModelViewSet):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):

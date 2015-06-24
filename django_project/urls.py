@@ -20,17 +20,21 @@ from rest_framework import routers
 from money.views import *
 
 router = routers.DefaultRouter()
-router.register(r'users', UserViewSet)
+# router.register(r'users', UserViewSet)
+# router.register(r'groups', GroupViewSet)
 router.register(r'accounts', AccountViewSet)
-router.register(r'categories', CategoryViewSet)
-router.register(r'operations', OperationViewSet)
-router.register(r'transfers', TransferViewSet)
 router.register(r'goals', GoalViewSet)
+# router.register(r'categories', CategoryViewSet)
+# router.register(r'operations', OperationViewSet)
+# router.register(r'transfers', TransferViewSet)
 
 urlpatterns = [
     url(r'^', include('money.urls', namespace='money')),
     url(r'^accounts/', include('accounts.urls', namespace='accounts')),
     url(r'^admin/', include(admin.site.urls)),
+
+    # AngularJS
+    url(r'^angular/', include('angular.urls', namespace='angular')),
 
     # Django REST
     url(r'^api/', include(router.urls)),

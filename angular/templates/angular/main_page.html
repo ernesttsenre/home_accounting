@@ -1,0 +1,27 @@
+{% load static %}
+<!doctype html>
+<html lang="en" ng-app="project">
+<head>
+    <meta charset="UTF-8">
+    <title>Angular</title>
+</head>
+<body>
+
+<div ng-view></div>
+
+{# Angular Source #}
+<script src="{% static 'vendors/angular/angular.min.js' %}"></script>
+<script src="{% static 'vendors/angular/angular-resource.min.js' %}"></script>
+<script src="{% static 'vendors/angular/angular-route.min.js' %}"></script>
+
+{# Angular Bootstrap #}
+<script src="{% static 'app.js' %}"></script>
+
+{# Angular Controllers #}
+<script src="{% static 'controllers/Controllers.js' %}"></script>
+<script src="{% static 'controllers/MainPageController.js' %}"></script>
+
+{# Angular Services #}
+<script src="{% static 'services/MoneyService.js' %}"></script>
+</body>
+</html>

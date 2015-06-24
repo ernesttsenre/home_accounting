@@ -28,7 +28,7 @@ class Operation(models.Model):
         Account,
         verbose_name='Счет',
         related_query_name='operations',
-        # related_name='operations',
+        related_name='operations',
         on_delete=models.CASCADE
     )
 

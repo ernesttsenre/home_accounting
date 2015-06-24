@@ -27,7 +27,6 @@ class Operation(models.Model):
     account = models.ForeignKey(
         Account,
         verbose_name='Счет',
-        reated_name='operations',
         on_delete=models.CASCADE
     )
 

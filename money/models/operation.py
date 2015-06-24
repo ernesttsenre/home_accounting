@@ -27,7 +27,7 @@ class Operation(models.Model):
     account = models.ForeignKey(
         Account,
         verbose_name='Счет',
-        related_name='operations',
+        reated_name='operations',
         on_delete=models.CASCADE
     )
 
@@ -100,10 +100,13 @@ class Operation(models.Model):
         if self.category:
             title = self.category.title
         else:
-            if self.type == Operation.CREDIT_OPERATION:
-                title = "Перевод в %s" % self.transfer.account_to.title
+            if self.transfer:
+                if self.type == Operation.CREDIT_OPERATION:
+                    title = "Перевод в %s" % self.transfer.account_to.title
+                else:
+                    title = "Перевод из %s" % self.transfer.account_from.title
             else:
-                title = "Перевод из %s" % self.transfer.account_from.title
+                title = 'Неизвестно'
 
         return title
 

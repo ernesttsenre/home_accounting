@@ -7,3 +7,4 @@ djrill
 djangorestframework
 markdown
 django-filter
+gunicorn

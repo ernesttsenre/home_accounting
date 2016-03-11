@@ -19,9 +19,9 @@ PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
 
 LOCALE_PATHS = (BASE_DIR + '/locale',)
 
-TEMPLATE_CONTEXT_PROCESSORS = TCP + (
+TEMPLATE_CONTEXT_PROCESSORS = TCP + [
     'django.core.context_processors.request',
-)
+]
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
